@@ -23,6 +23,7 @@ https://huggingface.co/models?filter=fill-mask
 import logging
 import math
 import os
+import random
 import sys
 from dataclasses import dataclass, field
 from typing import Optional
@@ -353,21 +354,26 @@ def main():
                     remove_columns=["text"],
                 )
     else:
-        logger.info(f"Splitting documents on the fly in sequences up to {max_seq_length}!!!")
+        logger.info(f"Sub-sampling documents subsequences up to {max_seq_length} on the fly!!!")
         # When using line_by_line, we just tokenize each nonempty line.
         padding = "max_length" if data_args.pad_to_max_length else False
-        max_sw_seq_length = int(max_seq_length * 0.9)
 
         def tokenize_function(examples):
             # Remove empty lines
+            examples[text_column_name] = [
+                line for line in examples[text_column_name] if len(line) > 0 and not line.isspace()
+            ]
+
             grouped_examples = []
             for line in examples[text_column_name]:
+                line_examples = []
                 if len(line) > 0 and not line.isspace():
-                    ws_tokens = line.split(' ')
+                    ws_tokens = line.split(' ')[:4 * max_seq_length]
                     prev_idx = 0
-                    for idx in range(max_sw_seq_length, len(ws_tokens) + max_sw_seq_length,  max_sw_seq_length):
-                        grouped_examples.append(' '.join(ws_tokens[prev_idx:idx]))
+                    for idx in range(max_seq_length, len(ws_tokens) + max_seq_length,  max_seq_length):
+                        line_examples.append(' '.join(ws_tokens[prev_idx:idx]))
                         prev_idx = idx
+                    grouped_examples.append(random.choice(line_examples))
 
             return tokenizer(
                 grouped_examples,
