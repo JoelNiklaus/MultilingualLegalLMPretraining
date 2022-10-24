@@ -25,6 +25,7 @@ def evaluate_tokenizers():
 
     # XLM-RoBERTa Tokenizer
     tokenizer = AutoTokenizer.from_pretrained('xlm-roberta-base')
+    fr_text = ''
     for LANG in multilingual_legal_dataset_test_subsets:
         fragmentation_ratio = []
         for document in multilingual_legal_dataset_test_subsets[LANG]:
