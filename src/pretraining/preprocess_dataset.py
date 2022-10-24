@@ -22,7 +22,7 @@ def preprocess_dataset(return_test_subsets=False):
 
     # normalize sampling scores
     sampling_scores = [sampling_score/sum(sampling_scores) for sampling_score in sampling_scores]
-    print({dataset.config_name.split('_')[0]: sr for dataset, sr in zip(datasets, sampling_scores)})
+    print({dataset.config_name: sr for dataset, sr in zip(datasets, sampling_scores)})
 
     # interleave datasets with sampling rates into a single dataset
     multilingual_legal_dataset = interleave_datasets(datasets, probabilities=sampling_scores, seed=42)
