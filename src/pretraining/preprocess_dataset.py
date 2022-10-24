@@ -16,7 +16,7 @@ def preprocess_dataset(return_test_subsets=False):
                 continue
             if DOMAIN_TYPE in ['caselaw', 'legislation']:
                 sampling_scores.append(0.35)
-            elif DOMAIN_TYPE in ['contracts' 'mc4_legal']:
+            elif DOMAIN_TYPE in ['contracts' 'other']:
                 sampling_scores.append(0.15)
             datasets.append(dataset)
 
