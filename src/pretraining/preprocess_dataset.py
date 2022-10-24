@@ -39,7 +39,9 @@ def preprocess_dataset(return_test_subsets=False):
                      "hu", "it", "lt", "lv", "mt", "nl", "pl", "pt", "ro", "sk", "sl", "sv"]:
             datasets[LANG] = multilingual_legal_dataset_splits['test'].\
                 filter(lambda example: example['language'] == LANG)
-            return datasets
+        return datasets
     else:
         return multilingual_legal_dataset_splits
 
+
+preprocess_dataset(return_test_subsets=True)
