@@ -13,23 +13,24 @@ def evaluate_tokenizers():
 
     # Custom Tokenizera
     for tokenizer_config in ['-32k', '-64k', '-128k']:
+        fr_text = ''
         for LANG in multilingual_legal_dataset_test_subsets:
             tokenizer = AutoTokenizer.from_pretrained(CUSTOM_TOK_FOLDER + tokenizer_config)
             fragmentation_ratio = []
-            fr_text = ''
             for document in multilingual_legal_dataset_test_subsets[LANG]:
-                fragmentation_ratio.append(len(tokenizer.tokenize(document['text'])) / len(document['text'].split()))
-                fr_text += f'{LANG}: {np.mean(fragmentation_ratio):.2f}\t'
+                if len(document['text'].split()):
+                    fragmentation_ratio.append(len(tokenizer.tokenize(document['text'])) / len(document['text'].split()))
+            fr_text += f'{LANG}: {np.mean(fragmentation_ratio):.2f}\t'
         print(f'Custom-Tokenizer{tokenizer_config}: {fr_text}')
 
     # XLM-RoBERTa Tokenizer
     for LANG in multilingual_legal_dataset_test_subsets:
         tokenizer = AutoTokenizer.from_pretrained('xlm-roberta-base')
         fragmentation_ratio = []
-        fr_text = ''
         for document in multilingual_legal_dataset_test_subsets[LANG]:
-            fragmentation_ratio.append(len(tokenizer.tokenize(document['text'])) / len(document['text'].split()))
-            fr_text += f'{LANG}: {np.mean(fragmentation_ratio):.2f}\t'
+            if len(document['text'].split()):
+                fragmentation_ratio.append(len(tokenizer.tokenize(document['text'])) / len(document['text'].split()))
+        fr_text += f'{LANG}: {np.mean(fragmentation_ratio):.2f}\t'
     print(f'XLM-RoBERTa-Tokenizer: {fr_text}')
 
 
