@@ -66,9 +66,10 @@ def main(vocab_size=64000):
 
     test_samples = dataset.take(500)
     for example in test_samples:
-        print(example['text'][:500])
+        text = ' '.join(example['text'].split()[:500])
+        print(text)
         print('-' * 150)
-        print(tokenizer.tokenize(example['text'][:500]))
+        print(tokenizer.tokenize(text))
         print('-' * 150)
 
 
