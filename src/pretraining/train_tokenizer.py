@@ -21,7 +21,6 @@ def main(vocab_size=64000):
 
     # configure tokenizer
     backend_tokenizer = Tokenizer(models.BPE(unk_token="<unk>"))
-    backend_tokenizer.normalizer = normalizers.Lowercase()
     backend_tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=True)
     backend_tokenizer.decoder = decoders.ByteLevel()
     backend_tokenizer.post_processor = processors.RobertaProcessing(sep=("</s>", 2), cls=("<s>", 1),

@@ -16,12 +16,14 @@ def preprocess_dataset(return_test_subsets=False):
                 continue
             if DOMAIN_TYPE in ['caselaw', 'legislation']:
                 sampling_scores.append(0.35)
-            elif DOMAIN_TYPE in ['contracts' 'other']:
+            elif DOMAIN_TYPE in ['contracts', 'other']:
                 sampling_scores.append(0.15)
             datasets.append(dataset)
 
     # normalize sampling scores
     sampling_scores = [sampling_score/sum(sampling_scores) for sampling_score in sampling_scores]
+    print({dataset.config_name.split('_')[0]: sr for dataset, sr in zip(datasets, sampling_scores)})
+
     # interleave datasets with sampling rates into a single dataset
     multilingual_legal_dataset = interleave_datasets(datasets, probabilities=sampling_scores, seed=42)
 
