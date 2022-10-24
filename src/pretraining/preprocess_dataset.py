@@ -5,8 +5,8 @@ def preprocess_dataset(return_test_subsets=False):
     # combine datasets into a large interleaved dataset
     datasets = []
     sampling_scores = []
-    for LANG in ['bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga',
-                 'hr', 'hu', 'it', 'lt', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv']:
+    for LANG in ["bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "ga", "hr",
+                 "hu", "it", "lt", "lv", "mt", "nl", "pl", "pt", "ro", "sk", "sl", "sv"]:
         for DOMAIN_TYPE in ['legislation', 'caselaw', 'contracts', 'other']:
             try:
                 dataset = load_dataset("joelito/Multi_Legal_Pile", f'{LANG}_{DOMAIN_TYPE}',
