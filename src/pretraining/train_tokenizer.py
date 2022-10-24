@@ -11,7 +11,7 @@ def batch_iterator(dataset):
     count = 0
     for example in iter(dataset):
         count += 1
-        if count >= 1e6:
+        if count >= 10e6:
             break
         yield example['text']
     yield 'End'
@@ -41,7 +41,7 @@ def main(vocab_size=64000):
     dataset = multilingual_legal_dataset['train']
 
     # train tokenizer
-    backend_tokenizer.train_from_iterator(trainer=trainer, iterator=batch_iterator(dataset), length=int(1e6))
+    backend_tokenizer.train_from_iterator(trainer=trainer, iterator=batch_iterator(dataset), length=int(10e6))
 
     # save tokenizer
     new_roberta_tokenizer = PreTrainedTokenizerFast(
