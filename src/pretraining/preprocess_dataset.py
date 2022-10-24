@@ -25,7 +25,8 @@ def preprocess_dataset(return_test_subsets=False):
     print({dataset.config_name: sr for dataset, sr in zip(datasets, sampling_scores)})
 
     # interleave datasets with sampling rates into a single dataset
-    multilingual_legal_dataset = interleave_datasets(datasets, probabilities=sampling_scores, seed=42)
+    multilingual_legal_dataset = interleave_datasets(datasets, probabilities=sampling_scores, seed=42,
+                                                     stopping_strategy='all_exhausted')
 
     # split into training and evaluation subsets
     multilingual_legal_dataset_splits = {}
@@ -42,6 +43,3 @@ def preprocess_dataset(return_test_subsets=False):
         return datasets
     else:
         return multilingual_legal_dataset_splits
-
-
-preprocess_dataset(return_test_subsets=True)
