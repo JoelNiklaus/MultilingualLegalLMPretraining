@@ -35,8 +35,8 @@ def preprocess_dataset(return_test_subsets=False):
     if return_test_subsets:
         datasets = {}
         # split test subsets per language
-        for LANG in ['bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga',
-                     'hr', 'hu', 'it', 'lt', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv']:
+        for LANG in ["bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "ga", "hr",
+                     "hu", "it", "lt", "lv", "mt", "nl", "pl", "pt", "ro", "sk", "sl", "sv"]:
             datasets[LANG] = multilingual_legal_dataset_splits['test'].\
                 filter(lambda example: example['language'] == LANG)
             return datasets

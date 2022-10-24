@@ -13,9 +13,9 @@ def evaluate_tokenizers():
 
     # Custom Tokenizera
     for tokenizer_config in ['-32k', '-64k', '-128k']:
+        tokenizer = AutoTokenizer.from_pretrained(CUSTOM_TOK_FOLDER + tokenizer_config)
         fr_text = ''
         for LANG in multilingual_legal_dataset_test_subsets:
-            tokenizer = AutoTokenizer.from_pretrained(CUSTOM_TOK_FOLDER + tokenizer_config)
             fragmentation_ratio = []
             for document in multilingual_legal_dataset_test_subsets[LANG]:
                 if len(document['text'].split()):
@@ -24,8 +24,8 @@ def evaluate_tokenizers():
         print(f'Custom-Tokenizer{tokenizer_config}: {fr_text}')
 
     # XLM-RoBERTa Tokenizer
+    tokenizer = AutoTokenizer.from_pretrained('xlm-roberta-base')
     for LANG in multilingual_legal_dataset_test_subsets:
-        tokenizer = AutoTokenizer.from_pretrained('xlm-roberta-base')
         fragmentation_ratio = []
         for document in multilingual_legal_dataset_test_subsets[LANG]:
             if len(document['text'].split()):
