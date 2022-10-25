@@ -1501,7 +1501,7 @@ class Trainer:
                     model.zero_grad()
                     self.state.global_step += 1
                     # Re-activate encoder updated
-                    if self.freeze_model_encoder and self.state.global_step / max_steps >= 0.2:
+                    if self.freeze_model_encoder and self.state.global_step / max_steps >= self.args.warmup_ratio:
                         for param in model.base_model.encoder.parameters():
                             param.requires_grad = True
                         model.base_model.encoder.training = True

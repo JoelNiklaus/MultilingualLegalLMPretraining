@@ -23,6 +23,7 @@ https://huggingface.co/models?filter=fill-mask
 import logging
 import math
 import os
+import re
 import random
 import sys
 from dataclasses import dataclass, field
@@ -52,9 +53,9 @@ from transformers.utils.versions import require_version
 from preprocess_dataset import preprocess_dataset
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
-check_min_version("4.15.0")
+check_min_version("4.18.0")
 
-require_version("datasets>=1.8.0", "To fix: pip install -r examples/pytorch/language-modeling/requirements.txt")
+require_version("datasets>=2.6.1", "To fix: pip install -r examples/pytorch/language-modeling/requirements.txt")
 
 logger = logging.getLogger(__name__)
 MODEL_CONFIG_CLASSES = list(MODEL_FOR_MASKED_LM_MAPPING.keys())
@@ -173,7 +174,7 @@ class DataTrainingArguments:
         },
     )
     freeze_model_encoder: Optional[bool] = field(
-        default=False,
+        default=True,
         metadata={
             "help": "Whether to freeze or not the model's encoder. Used for modded models where the vocab is new."
         },
@@ -333,7 +334,8 @@ def main():
         def tokenize_function(examples):
             # Remove empty lines
             examples[text_column_name] = [
-                line for line in examples[text_column_name] if len(line) > 0 and not line.isspace()
+                re.sub(r'(\n){2,}', r'\1', re.sub(r'(\t| | ){2,}', r' ', line))
+                for line in examples[text_column_name] if len(line) > 64 and not line.isspace()
             ]
             return tokenizer(
                 examples[text_column_name],
@@ -361,14 +363,15 @@ def main():
         def tokenize_function(examples):
             # Remove empty lines
             examples[text_column_name] = [
-                line for line in examples[text_column_name] if len(line) > 0 and not line.isspace()
+                re.sub(r'(\n){2,}', r'\1', re.sub(r'(\t| | ){2,}', r' ', line))
+                for line in examples[text_column_name] if len(line) > 64 and not line.isspace()
             ]
 
             grouped_examples = []
             for line in examples[text_column_name]:
                 line_examples = []
-                if len(line) > 0 and not line.isspace():
-                    ws_tokens = line.split(' ')[:4 * max_seq_length]
+                if len(line) > 64 and not line.isspace():
+                    ws_tokens = re.sub(r'(\n){2,}', r'\1', re.sub(r'(\t| | ){2,}', r' ', line)).split(' ')[:4 * max_seq_length]
                     prev_idx = 0
                     for idx in range(max_seq_length, len(ws_tokens) + max_seq_length,  max_seq_length):
                         line_examples.append(' '.join(ws_tokens[prev_idx:idx]))

@@ -2,6 +2,7 @@ from tokenizers import models, normalizers, pre_tokenizers, decoders, processors
 from tokenizers import Tokenizer
 from transformers import PreTrainedTokenizerFast, AutoTokenizer
 import os
+import re
 from data import DATA_DIR
 from preprocess_dataset import preprocess_dataset
 CUSTOM_TOK_FOLDER = os.path.join(DATA_DIR, 'plms', 'legal-xlm-base')
@@ -13,7 +14,7 @@ def batch_iterator(dataset):
         count += 1
         if count >= 10e6:
             break
-        yield example['text']
+        yield re.sub(r'(\n){2,}', r'\1', re.sub(r'(\t| | ){2,}', r' ', example['text']))
     yield 'End'
 
 
