@@ -454,6 +454,7 @@ def main():
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_tpu_available()
         else None,
+        # freeze the encoder for initial warm-start period: in warm-start period only train embeddings
         freeze_model_encoder=data_args.freeze_model_encoder
     )
 

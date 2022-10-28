@@ -1,16 +1,25 @@
 from datasets import load_dataset, interleave_datasets
 
+_LANGUAGES = ['bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga',
+              'hr', 'hu', 'it', 'lt', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv']
+_DOMAIN_TYPES = ['legislation', 'caselaw', 'contracts', 'other']
 
-def preprocess_dataset(return_test_subsets=False):
+
+def preprocess_dataset(languages=None, domain_types=None, return_test_subsets=False):
     # combine datasets into a large interleaved dataset
     datasets = []
     sampling_scores = []
-    for LANG in ["bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "ga", "hr",
-                 "hu", "it", "lt", "lv", "mt", "nl", "pl", "pt", "ro", "sk", "sl", "sv"]:
-        for DOMAIN_TYPE in ['legislation', 'caselaw', 'contracts', 'other']:
+    # set defaults if they are not set
+    if languages is None:
+        languages = _LANGUAGES
+    if domain_types is None:
+        domain_types = _DOMAIN_TYPES
+    for LANG in languages:
+        for DOMAIN_TYPE in domain_types:
             try:
                 dataset = load_dataset("joelito/Multi_Legal_Pile", f'{LANG}_{DOMAIN_TYPE}',
-                                       split='train', streaming=True)
+                                       split='train', streaming=True, use_auth_token=True)
+                print(f'Data found for `{DOMAIN_TYPE}` in language `{LANG}`.')
             except:
                 print(f'There is no data for `{DOMAIN_TYPE}` in language `{LANG}`.')
                 continue
@@ -28,17 +37,23 @@ def preprocess_dataset(return_test_subsets=False):
     multilingual_legal_dataset = interleave_datasets(datasets, probabilities=sampling_scores, seed=42,
                                                      stopping_strategy='all_exhausted')
 
+    print(list(multilingual_legal_dataset.take(1)))
+
+
     # split into training and evaluation subsets
     multilingual_legal_dataset_splits = {}
     multilingual_legal_dataset_splits['train'] = multilingual_legal_dataset
-    multilingual_legal_dataset_splits['test'] = multilingual_legal_dataset.take(100000)
+    test_size = 5000 if len(languages) == 1 else 100000  # take less for test if we train monolingual models
+    multilingual_legal_dataset_splits['test'] = multilingual_legal_dataset.take(test_size)
+
+    print(list(multilingual_legal_dataset.take(1)))
+
 
     if return_test_subsets:
         datasets = {}
         # split test subsets per language
-        for LANG in ["bg", "cs", "da", "de", "el", "en", "es", "et", "fi", "fr", "ga", "hr",
-                     "hu", "it", "lt", "lv", "mt", "nl", "pl", "pt", "ro", "sk", "sl", "sv"]:
-            datasets[LANG] = multilingual_legal_dataset_splits['test'].\
+        for LANG in languages:
+            datasets[LANG] = multilingual_legal_dataset_splits['test']. \
                 filter(lambda example: example['language'] == LANG)
         return datasets
     else:

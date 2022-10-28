@@ -56,3 +56,18 @@ python src/mod_teacher_model.py --teacher_model_path xlm-roberta-base --student_
 export PYTHONPATH=.
 python src/longformerize_model.py --roberta_model_path data/plms/legal-xlm-base --max_length 4096 --attention_window 128
 ```
+
+
+## Pipeline
+1. Train tokenizer (Only RoBERTa needed because we convert BERT models to RoBERTa)
+2. Evaluate tokenizer
+3. Mod Teacher Model
+4. Train MLM (monolingual: 500K steps) (TPUs or GPUs)
+5. Evaluate MLM
+6. Longformerize MLM
+7. Train Longformer MLM (monolingual: 50K steps) (only GPUs!)
+8. Evaluate Longformer MLM 
+
+## Troubleshooting
+
+If you get a PermissionError: [Errno 13] Permission denied: set the permissions to 777.

@@ -45,9 +45,9 @@ def mod_roberta(teacher_model, student_model, student_teacher_mapping_ids):
 
 def mod_bert(teacher_model, student_model, student_teacher_mapping_ids):
     # copy positional and token type embeddings
-    student_model.roberta.embeddings.position_embeddings.weight[2:] =\
+    student_model.roberta.embeddings.position_embeddings.weight[2:] = \
         teacher_model.bert.embeddings.position_embeddings.weight.detach()
-    student_model.roberta.embeddings.token_type_embeddings.weight[0] =\
+    student_model.roberta.embeddings.token_type_embeddings.weight[0] = \
         teacher_model.bert.embeddings.token_type_embeddings.weight.detach()[0]
     student_model.roberta.embeddings.LayerNorm. \
         load_state_dict(teacher_model.bert.embeddings.LayerNorm.state_dict())
@@ -55,6 +55,7 @@ def mod_bert(teacher_model, student_model, student_teacher_mapping_ids):
     # Extract teacher word embeddings
     word_embeddings_matrix = copy.deepcopy(teacher_model.bert.embeddings.word_embeddings.weight.detach())
     word_embeddings = [word_embeddings_matrix[teacher_id] if isinstance(teacher_id, int)
+                       # average embeddings if it is multiple tokens
                        else word_embeddings_matrix[teacher_id].mean(dim=0)
                        for student_id, teacher_id in student_teacher_mapping_ids.items()]
     word_embeddings = torch.stack(word_embeddings)
