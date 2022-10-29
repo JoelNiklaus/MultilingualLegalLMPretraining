@@ -1,13 +1,14 @@
+import shutil
+
 from tokenizers import models, pre_tokenizers, decoders, processors, trainers
 from tokenizers import Tokenizer
 from transformers import PreTrainedTokenizerFast, AutoTokenizer
 import os
 import re
-from data import DATA_DIR
 from preprocess_dataset import preprocess_dataset
+from src.pretraining.tokenizer_utils import CUSTOM_TOK_FOLDER, get_vocab_tok_folder
 
-CUSTOM_TOK_FOLDER = os.path.join(DATA_DIR, 'plms', 'legal-xlm-base')
-max_examples = int(10e6)
+max_examples = int(1e7)  # 1e7
 
 
 def batch_iterator(dataset):
@@ -21,7 +22,7 @@ def batch_iterator(dataset):
     yield 'End'
 
 
-def main(vocab_size=64000, languages=None, domain_types=None):
+def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
     # configure tokenizer
     backend_tokenizer = Tokenizer(models.BPE(unk_token="<unk>"))  # WordPiece for BERT
     backend_tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=True)  # BertPreTokenizer for BERT
@@ -65,12 +66,15 @@ def main(vocab_size=64000, languages=None, domain_types=None):
         mask_token='<mask>',  # [MASK]
     )
 
-    new_roberta_tokenizer.save_pretrained(CUSTOM_TOK_FOLDER)
-    tokenizer = AutoTokenizer.from_pretrained(CUSTOM_TOK_FOLDER)
+    # save and load tokenizer
+    vocab_tok_folder = get_vocab_tok_folder(languages, vocab_size)
+    new_roberta_tokenizer.save_pretrained(vocab_tok_folder)
+    shutil.copy(os.path.join(CUSTOM_TOK_FOLDER, "config.json"), os.path.join(vocab_tok_folder, "config.json"))
+    tokenizer = AutoTokenizer.from_pretrained(vocab_tok_folder)
 
-    print(f'Trained BPE tokenizer with  a vocabulary of {vocab_size} sub-words successfully!')  # TODO adapt message
+    print(f'Trained BPE tokenizer with  a vocabulary of {vocab_size} sub-words successfully!')
 
-    test_samples = dataset.take(500)
+    test_samples = dataset.take(5)
     for example in test_samples:
         text = ' '.join(example['text'].split()[:500])
         print(text)
@@ -82,6 +86,10 @@ def main(vocab_size=64000, languages=None, domain_types=None):
 if __name__ == "__main__":
     """
     Run with 
-    export PYTHONPATH=. && python src/pretraining/train_tokenizer.py
+    export PYTHONPATH=. && python src/pretraining/train_tokenizer.py | tee train_tokenizer.log
     """
-    main(vocab_size=32_000, languages=['fr'])
+    vocab_sizes = [32000, 64000, 128000]
+    languages = [None, ['de'], ['fr'], ['it']]  # None is for all languages
+    for language in languages:
+        for vocab_size in vocab_sizes:
+            train_tokenizers(vocab_size=vocab_size, languages=language)

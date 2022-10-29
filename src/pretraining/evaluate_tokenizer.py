@@ -1,43 +1,51 @@
 from transformers import AutoTokenizer
-import os
-from data import DATA_DIR
 import numpy as np
 from preprocess_dataset import preprocess_dataset
-CUSTOM_TOK_FOLDER = os.path.join(DATA_DIR, 'plms', 'legal-xlm-base')
+from src.pretraining.tokenizer_utils import get_vocab_tok_folder, comparison_tokenizers
 
 
-def evaluate_tokenizers():
+def evaluate_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
     """
     Compare different tokenizers
     :return:
     """
 
     # preprocess multilingual legal dataset
-    multilingual_legal_dataset_test_subsets = preprocess_dataset(return_test_subsets=True)
+    multilingual_legal_dataset_test_subsets = preprocess_dataset(languages=languages, domain_types=domain_types,
+                                                                 return_test_subsets=True)
 
     # Custom Tokenizer
-    for tokenizer_config in ['-32k', '-64k', '-128k']:
-        tokenizer = AutoTokenizer.from_pretrained(CUSTOM_TOK_FOLDER + tokenizer_config)
-        fr_text = ''
-        for LANG in multilingual_legal_dataset_test_subsets:
-            fragmentation_ratio = []
-            for document in multilingual_legal_dataset_test_subsets[LANG]:
-                if len(document['text'].split()):
-                    fragmentation_ratio.append(len(tokenizer.tokenize(document['text'])) / len(document['text'].split()))
-            fr_text += f'{LANG}: {np.mean(fragmentation_ratio):.2f}\t'
-        print(f'Custom-Tokenizer{tokenizer_config}: {fr_text}')
+    vocab_tok_folder = get_vocab_tok_folder(languages, vocab_size)
+    print_fragmentation_per_language(multilingual_legal_dataset_test_subsets, vocab_tok_folder)
 
     # XLM-RoBERTa Tokenizer
-    tokenizer = AutoTokenizer.from_pretrained('xlm-roberta-base')
+    comparison_tokenizer = comparison_tokenizers[languages[0]] if languages else 'xlm-roberta-base'
+    print_fragmentation_per_language(multilingual_legal_dataset_test_subsets, comparison_tokenizer)
+
+
+def print_fragmentation_per_language(multilingual_legal_dataset_test_subsets, tokenizer_name):
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     fr_text = ''
     for LANG in multilingual_legal_dataset_test_subsets:
-        fragmentation_ratio = []
+        fragmentation_ratios = []
         for document in multilingual_legal_dataset_test_subsets[LANG]:
-            if len(document['text'].split()):
-                fragmentation_ratio.append(len(tokenizer.tokenize(document['text'])) / len(document['text'].split()))
-        fr_text += f'{LANG}: {np.mean(fragmentation_ratio):.2f}\t'
-    print(f'XLM-RoBERTa-Tokenizer: {fr_text}')
+            text = document['text']
+            if len(text.split()):
+                fragmentation_ratios.append(len(tokenizer.tokenize(text)) / len(text.split()))
+        fr_text += f'{LANG}: {np.mean(fragmentation_ratios):.2f}\t'
+    print(f'{tokenizer_name} Tokenizer (vocab size: {tokenizer.vocab_size}) '
+          f'fragmentation ratios (tokens / words): {fr_text}')
 
 
 if __name__ == "__main__":
-    evaluate_tokenizers()
+    """
+    Run with 
+    export PYTHONPATH=. && python src/pretraining/evaluate_tokenizer.py | tee evaluate_tokenizer.log
+    """
+    vocab_sizes = [32000, 64000, 128000]
+    # vocab_sizes = [32000]
+    languages = [None, ['de'], ['fr'], ['it']]  # None is for all languages
+    # languages = [['fr']]
+    for language in languages:
+        for vocab_size in vocab_sizes:
+            evaluate_tokenizers(vocab_size=vocab_size, languages=language)
