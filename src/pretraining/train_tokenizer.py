@@ -4,9 +4,8 @@ from tokenizers import models, pre_tokenizers, decoders, processors, trainers
 from tokenizers import Tokenizer
 from transformers import PreTrainedTokenizerFast, AutoTokenizer
 import os
-import re
 from preprocess_dataset import preprocess_dataset
-from src.pretraining.tokenizer_utils import CUSTOM_TOK_FOLDER, get_vocab_tok_folder
+from src.pretraining.tokenizer_utils import CUSTOM_TOK_FOLDER, get_vocab_tok_folder, normalize_text
 
 max_examples = int(1e7)  # 1e7
 
@@ -18,7 +17,7 @@ def batch_iterator(dataset):
         if count >= max_examples:
             break
         # normalize documents by removing bad information (multiple new lines, tabs, whitespace, etc.)
-        yield re.sub(r'\n{2,}', r'\n', re.sub(r'(\t| | ){2,}', r' ', example['text']))
+        yield normalize_text(example['text'])
     yield 'End'
 
 
