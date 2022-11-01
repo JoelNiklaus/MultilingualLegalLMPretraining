@@ -1,6 +1,6 @@
 import shutil
 
-from tokenizers import models, pre_tokenizers, decoders, processors, trainers
+from tokenizers import models, pre_tokenizers, decoders, processors, trainers, normalizers
 from tokenizers import Tokenizer
 from transformers import PreTrainedTokenizerFast, AutoTokenizer
 import os
@@ -18,14 +18,17 @@ def batch_iterator(dataset):
         if count >= max_examples:
             break
         # normalize documents by removing bad information (multiple new lines, tabs, whitespace, etc.)
-        yield re.sub(r'\n+ ', '\n', re.sub(r'[\t  ]+', ' ', example['text']))
+        yield example['text']
     yield 'End'
 
 
 def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
     # configure tokenizer
     backend_tokenizer = Tokenizer(models.BPE(unk_token="<unk>"))  # WordPiece for BERT
-    backend_tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=True)  # BertPreTokenizer for BERT
+    backend_tokenizer.normalizer = normalizers.Sequence(
+        [normalizers.NFKD(), normalizers.BertNormalizer(lowercase=False)])
+    backend_tokenizer.pre_tokenizer = pre_tokenizers.Sequence(
+        [pre_tokenizers.BertPreTokenizer(), pre_tokenizers.ByteLevel(add_prefix_space=True)])
     backend_tokenizer.decoder = decoders.ByteLevel()  # WordPiece for BERT
     backend_tokenizer.post_processor = processors.RobertaProcessing(sep=("</s>", 2), cls=("<s>", 1),
                                                                     add_prefix_space=True,
@@ -77,7 +80,6 @@ def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
     test_samples = dataset.take(5)
     for example in test_samples:
         text = ' '.join(example['text'].split()[:500])
-        text = re.sub(r'\n+ ', '\n', re.sub(r'[\t  ]+', ' ', text))
         print(text)
         print('-' * 150)
         print(tokenizer.tokenize(text))
