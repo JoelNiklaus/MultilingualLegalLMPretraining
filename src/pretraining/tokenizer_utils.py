@@ -32,4 +32,4 @@ def get_vocab_tok_folder(languages, vocab_size):
 
 
 def normalize_text(text):
-    return re.sub(r'\n{2,}', r'\n', re.sub(r'(\t| | ){2,}', r' ', text))
+    return re.sub(r'\n+ ', '\n', re.sub(r'[\t  ]+', ' ', text))

@@ -7,7 +7,7 @@ import os
 from preprocess_dataset import preprocess_dataset
 from src.pretraining.tokenizer_utils import CUSTOM_TOK_FOLDER, get_vocab_tok_folder, normalize_text
 
-max_examples = int(1e7)  # 1e7
+max_examples = int(5e5)  # 1e7
 
 
 def batch_iterator(dataset):
@@ -76,6 +76,7 @@ def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
     test_samples = dataset.take(5)
     for example in test_samples:
         text = ' '.join(example['text'].split()[:500])
+        text = normalize_text(text)
         print(text)
         print('-' * 150)
         print(tokenizer.tokenize(text))
