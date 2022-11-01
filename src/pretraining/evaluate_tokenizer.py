@@ -31,6 +31,7 @@ def print_fragmentation_per_language(multilingual_legal_dataset_test_subsets, to
         for document in multilingual_legal_dataset_test_subsets[LANG]:
             text = document['text']
             if len(text.split()):
+                # num tokens / num words (whitespace split)
                 fragmentation_ratios.append(len(tokenizer.tokenize(text)) / len(text.split()))
         fr_text += f'{LANG}: {np.mean(fragmentation_ratios):.2f}\t'
     print(f'{tokenizer_name} Tokenizer (vocab size: {tokenizer.vocab_size}) '
