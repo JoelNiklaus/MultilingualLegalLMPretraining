@@ -8,7 +8,7 @@ import re
 from preprocess_dataset import preprocess_dataset
 from src.pretraining.tokenizer_utils import CUSTOM_TOK_FOLDER, get_vocab_tok_folder
 
-max_examples = int(1e7)  # 1e7
+max_examples = int(5e5)  # 1e7
 
 
 def batch_iterator(dataset):
@@ -18,7 +18,7 @@ def batch_iterator(dataset):
         if count >= max_examples:
             break
         # normalize documents by removing bad information (multiple new lines, tabs, whitespace, etc.)
-        yield re.sub(r'\n{2,}', r'\n', re.sub(r'(\t| | ){2,}', r' ', example['text']))
+        yield re.sub(r'\n+ ', '\n', re.sub(r'[\t  ]+', ' ', example['text']))
     yield 'End'
 
 
@@ -77,6 +77,7 @@ def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
     test_samples = dataset.take(5)
     for example in test_samples:
         text = ' '.join(example['text'].split()[:500])
+        text = re.sub(r'\n+ ', '\n', re.sub(r'[\t  ]+', ' ', text))
         print(text)
         print('-' * 150)
         print(tokenizer.tokenize(text))
