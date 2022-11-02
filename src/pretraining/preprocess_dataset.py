@@ -22,13 +22,14 @@ def preprocess_dataset(languages=None, domain_types=None, return_test_subsets=Fa
                 dataset = dataset.filter(lambda example: example['text'] and len(example['text']) > 0)
 
                 print(f'Found data for `{DOMAIN_TYPE}` in language `{LANG}`.')
+                print("Example: ", list(dataset.take(1)))
             except:
                 print(f'There is no data for `{DOMAIN_TYPE}` in language `{LANG}`.')
                 continue
             if DOMAIN_TYPE in ['caselaw', 'legislation']:
-                sampling_scores.append(0.35)
-            elif DOMAIN_TYPE in ['contracts', 'other']:
-                sampling_scores.append(0.15)
+                sampling_scores.append(0.45)  # caselaw and legislation are more important
+            elif DOMAIN_TYPE in ['contracts', 'other']:  # chance of having toxic text is very low in legal text
+                sampling_scores.append(0.05)  # but in the 'other' category, we are not sure about the quality
             datasets.append(dataset)
 
     # normalize sampling scores
@@ -40,16 +41,12 @@ def preprocess_dataset(languages=None, domain_types=None, return_test_subsets=Fa
     multilingual_legal_dataset = interleave_datasets(datasets, probabilities=sampling_scores, seed=42,
                                                      stopping_strategy='all_exhausted')
 
-    print("Example: ", list(multilingual_legal_dataset.take(1)))
-
     # split into training and evaluation subsets
     print("Splitting into training and evaluation subsets")
     multilingual_legal_dataset_splits = {}
     multilingual_legal_dataset_splits['train'] = multilingual_legal_dataset
     test_size = 10000 if len(languages) == 1 else 100000  # take less for test if we train monolingual models
     multilingual_legal_dataset_splits['test'] = multilingual_legal_dataset.take(test_size)
-
-    print("Example: ", list(multilingual_legal_dataset.take(1)))
 
     if return_test_subsets:
         datasets = {}

@@ -34,3 +34,13 @@ def get_vocab_tok_folder(languages, vocab_size):
 def normalize_text(text):
     # normalize documents by removing bad information (multiple new lines, tabs, whitespace, etc.)
     return re.sub(r'\n+ ', '\n', re.sub(r'[\t  ]+', ' ', text))
+
+
+def show_examples(dataset, tokenizer):
+    test_samples = dataset.take(5)
+    for example in test_samples:
+        text = ' '.join(example['text'].split()[:500])
+        print(text)
+        print('-' * 150)
+        print(tokenizer.tokenize(text))
+        print('-' * 150)

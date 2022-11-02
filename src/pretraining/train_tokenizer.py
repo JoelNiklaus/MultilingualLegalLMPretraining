@@ -5,7 +5,7 @@ from tokenizers import Tokenizer
 from transformers import PreTrainedTokenizerFast, AutoTokenizer
 import os
 from preprocess_dataset import preprocess_dataset
-from src.pretraining.tokenizer_utils import CUSTOM_TOK_FOLDER, get_vocab_tok_folder
+from src.pretraining.tokenizer_utils import CUSTOM_TOK_FOLDER, get_vocab_tok_folder, show_examples
 
 max_examples = int(5e5)
 
@@ -75,13 +75,7 @@ def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
 
     print(f'Trained BPE tokenizer with  a vocabulary of {vocab_size} sub-words successfully!')
 
-    test_samples = dataset.take(5)
-    for example in test_samples:
-        text = ' '.join(example['text'].split()[:500])
-        print(text)
-        print('-' * 150)
-        print(tokenizer.tokenize(text))
-        print('-' * 150)
+    show_examples(dataset, tokenizer)
 
 
 if __name__ == "__main__":
