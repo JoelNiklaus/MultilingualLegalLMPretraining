@@ -61,7 +61,7 @@ if __name__ == "__main__":
     """
     vocab_sizes = [32000, 64000, 128000]
     # vocab_sizes = [32000]
-    languages = [None, ['de'], ['fr'], ['it']]  # None is for all languages
+    languages = [['de'], ['fr'], ['it'], None]  # None is for all languages
     # languages = [['it']]
     for language in languages:
         for vocab_size in vocab_sizes:
