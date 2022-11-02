@@ -32,4 +32,5 @@ def get_vocab_tok_folder(languages, vocab_size):
 
 
 def normalize_text(text):
+    # normalize documents by removing bad information (multiple new lines, tabs, whitespace, etc.)
     return re.sub(r'\n+ ', '\n', re.sub(r'[\t  ]+', ' ', text))

@@ -46,6 +46,8 @@ from transformers import (
     is_torch_tpu_available,
     set_seed,
 )
+
+from src.pretraining.tokenizer_utils import normalize_text
 from trainer import Trainer
 from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version
@@ -72,7 +74,7 @@ class ModelArguments:
         default=None,
         metadata={
             "help": "The model checkpoint for weights initialization."
-            "Don't set if you want to train a model from scratch."
+                    "Don't set if you want to train a model from scratch."
         },
     )
     model_type: Optional[str] = field(
@@ -83,7 +85,7 @@ class ModelArguments:
         default=None,
         metadata={
             "help": "Override some existing default config settings when a model is trained from scratch. Example: "
-            "n_embd=10,resid_pdrop=0.2,scale_attn_weights=false,summary_type=cls_index"
+                    "n_embd=10,resid_pdrop=0.2,scale_attn_weights=false,summary_type=cls_index"
         },
     )
     config_name: Optional[str] = field(
@@ -108,7 +110,7 @@ class ModelArguments:
         default=False,
         metadata={
             "help": "Will use the token generated when running `transformers-cli login` (necessary to use this script "
-            "with private models)."
+                    "with private models)."
         },
     )
 
@@ -138,7 +140,7 @@ class DataTrainingArguments:
         default=None,
         metadata={
             "help": "The maximum total input sequence length after tokenization. Sequences longer "
-            "than this will be truncated."
+                    "than this will be truncated."
         },
     )
     preprocessing_num_workers: Optional[int] = field(
@@ -156,21 +158,21 @@ class DataTrainingArguments:
         default=False,
         metadata={
             "help": "Whether to pad all samples to `max_seq_length`. "
-            "If False, will pad the samples dynamically when batching to the maximum length in the batch."
+                    "If False, will pad the samples dynamically when batching to the maximum length in the batch."
         },
     )
     max_train_samples: Optional[int] = field(
         default=None,
         metadata={
             "help": "For debugging purposes or quicker training, truncate the number of training examples to this "
-            "value if set."
+                    "value if set."
         },
     )
     max_eval_samples: Optional[int] = field(
         default=None,
         metadata={
             "help": "For debugging purposes or quicker training, truncate the number of evaluation examples to this "
-            "value if set."
+                    "value if set."
         },
     )
     freeze_model_encoder: Optional[bool] = field(
@@ -334,8 +336,7 @@ def main():
         def tokenize_function(examples):
             # Remove empty lines
             examples[text_column_name] = [
-                re.sub(r'(\n){2,}', r'\1', re.sub(r'(\t| | ){2,}', r' ', line))
-                for line in examples[text_column_name] if len(line) > 64 and not line.isspace()
+                normalize_text(line) for line in examples[text_column_name] if len(line) > 64 and not line.isspace()
             ]
             return tokenizer(
                 examples[text_column_name],
@@ -363,17 +364,16 @@ def main():
         def tokenize_function(examples):
             # Remove empty lines
             examples[text_column_name] = [
-                re.sub(r'(\n){2,}', r'\1', re.sub(r'(\t| | ){2,}', r' ', line))
-                for line in examples[text_column_name] if len(line) > 64 and not line.isspace()
+                normalize_text(line) for line in examples[text_column_name] if len(line) > 64 and not line.isspace()
             ]
 
             grouped_examples = []
             for line in examples[text_column_name]:
                 line_examples = []
                 if len(line) > 64 and not line.isspace():
-                    ws_tokens = re.sub(r'(\n){2,}', r'\1', re.sub(r'(\t| | ){2,}', r' ', line)).split(' ')[:4 * max_seq_length]
+                    ws_tokens = normalize_text(line).split(' ')[:4 * max_seq_length]
                     prev_idx = 0
-                    for idx in range(max_seq_length, len(ws_tokens) + max_seq_length,  max_seq_length):
+                    for idx in range(max_seq_length, len(ws_tokens) + max_seq_length, max_seq_length):
                         line_examples.append(' '.join(ws_tokens[prev_idx:idx]))
                         prev_idx = idx
                     grouped_examples.append(random.choice(line_examples))
