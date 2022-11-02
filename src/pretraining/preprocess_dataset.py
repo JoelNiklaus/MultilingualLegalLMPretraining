@@ -19,9 +19,9 @@ def preprocess_dataset(languages=None, domain_types=None, return_test_subsets=Fa
             try:
                 dataset = load_dataset("joelito/Multi_Legal_Pile", f'{LANG}_{DOMAIN_TYPE}',
                                        split='train', streaming=True, use_auth_token=True)
-                dataset = dataset.filter(lambda example: len(example['text']) > 0)
+                dataset = dataset.filter(lambda example: example['text'] and len(example['text']) > 0)
 
-                print(f'Data found for `{DOMAIN_TYPE}` in language `{LANG}`.')
+                print(f'Found data for `{DOMAIN_TYPE}` in language `{LANG}`.')
             except:
                 print(f'There is no data for `{DOMAIN_TYPE}` in language `{LANG}`.')
                 continue
@@ -33,21 +33,23 @@ def preprocess_dataset(languages=None, domain_types=None, return_test_subsets=Fa
 
     # normalize sampling scores
     sampling_scores = [sampling_score / sum(sampling_scores) for sampling_score in sampling_scores]
-    print({dataset.config_name: sr for dataset, sr in zip(datasets, sampling_scores)})
+    print("Sampling Scores: ", {dataset.config_name: sr for dataset, sr in zip(datasets, sampling_scores)})
 
     # interleave datasets with sampling rates into a single dataset
+    print("Interleaving datasets")
     multilingual_legal_dataset = interleave_datasets(datasets, probabilities=sampling_scores, seed=42,
                                                      stopping_strategy='all_exhausted')
 
-    print(list(multilingual_legal_dataset.take(1)))
+    print("Example: ", list(multilingual_legal_dataset.take(1)))
 
     # split into training and evaluation subsets
+    print("Splitting into training and evaluation subsets")
     multilingual_legal_dataset_splits = {}
     multilingual_legal_dataset_splits['train'] = multilingual_legal_dataset
-    test_size = 5000 if len(languages) == 1 else 100000  # take less for test if we train monolingual models
+    test_size = 10000 if len(languages) == 1 else 100000  # take less for test if we train monolingual models
     multilingual_legal_dataset_splits['test'] = multilingual_legal_dataset.take(test_size)
 
-    print(list(multilingual_legal_dataset.take(1)))
+    print("Example: ", list(multilingual_legal_dataset.take(1)))
 
     if return_test_subsets:
         datasets = {}

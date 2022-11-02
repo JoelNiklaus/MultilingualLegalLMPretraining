@@ -4,11 +4,10 @@ from tokenizers import models, pre_tokenizers, decoders, processors, trainers, n
 from tokenizers import Tokenizer
 from transformers import PreTrainedTokenizerFast, AutoTokenizer
 import os
-import re
 from preprocess_dataset import preprocess_dataset
 from src.pretraining.tokenizer_utils import CUSTOM_TOK_FOLDER, get_vocab_tok_folder
 
-max_examples = int(5e5)  # 1e7
+max_examples = int(5e5)
 
 
 def batch_iterator(dataset):
@@ -17,7 +16,6 @@ def batch_iterator(dataset):
         count += 1
         if count >= max_examples:
             break
-        # normalize documents by removing bad information (multiple new lines, tabs, whitespace, etc.)
         yield example['text']
     yield 'End'
 
@@ -92,7 +90,9 @@ if __name__ == "__main__":
     export PYTHONPATH=. && python src/pretraining/train_tokenizer.py | tee train_tokenizer.log
     """
     vocab_sizes = [32000, 64000, 128000]
+    # vocab_sizes = [32000]
     languages = [None, ['de'], ['fr'], ['it']]  # None is for all languages
+    # languages = [['it']]  # None is for all languages
     for language in languages:
         for vocab_size in vocab_sizes:
             train_tokenizers(vocab_size=vocab_size, languages=language)
