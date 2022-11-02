@@ -1,4 +1,4 @@
-from datasets import load_dataset, interleave_datasets
+from datasets import load_dataset, interleave_datasets, Dataset
 
 _LANGUAGES = ['bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga',
               'hr', 'hu', 'it', 'lt', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv']
@@ -32,7 +32,7 @@ def preprocess_dataset(languages=None, domain_types=None, return_test_subsets=Fa
                 sampling_scores.append(0.05)  # but in the 'other' category, we are not sure about the quality
             datasets.append(dataset)
 
-    # normalize sampling scores
+    # normalize sampling scores across languages
     sampling_scores = [sampling_score / sum(sampling_scores) for sampling_score in sampling_scores]
     print("Sampling Scores: ", {dataset.config_name: sr for dataset, sr in zip(datasets, sampling_scores)})
 
@@ -44,16 +44,17 @@ def preprocess_dataset(languages=None, domain_types=None, return_test_subsets=Fa
     # split into training and evaluation subsets
     print("Splitting into training and evaluation subsets")
     multilingual_legal_dataset_splits = {}
-    multilingual_legal_dataset_splits['train'] = multilingual_legal_dataset
-    test_size = 10000 if len(languages) == 1 else 100000  # take less for test if we train monolingual models
+    test_size = 5_000 * len(languages)  # for each language 5_000
+    multilingual_legal_dataset_splits['train'] = multilingual_legal_dataset.skip(test_size)
     multilingual_legal_dataset_splits['test'] = multilingual_legal_dataset.take(test_size)
 
     if return_test_subsets:
-        datasets = {}
+        # Convert to a normal dataset to prevent wierd issues with references with the iterable datasets
+        map_style_test_dataset = Dataset.from_list(list(multilingual_legal_dataset_splits['test']))
+        test_datasets = {}
         # split test subsets per language
         for LANG in languages:
-            datasets[LANG] = multilingual_legal_dataset_splits['test']. \
-                filter(lambda example: example['language'] == LANG)
-        return datasets
+            test_datasets[LANG] = map_style_test_dataset.filter(lambda x: x['language'] == LANG)
+        return test_datasets
     else:
         return multilingual_legal_dataset_splits

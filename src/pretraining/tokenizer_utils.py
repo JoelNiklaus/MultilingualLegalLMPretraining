@@ -26,7 +26,7 @@ comparison_tokenizers = {
 
 
 def get_vocab_tok_folder(languages, vocab_size):
-    lang = f"{isocode2lang[languages[0]]}-bert" if languages else 'xlm'
+    lang = f"{isocode2lang[languages[0]]}-bert" if languages or len(languages) == 1 else 'xlm'
     lang_folder = os.path.join(PLM_FOLDER, f"legal-{lang}-base")
     return lang_folder + f'_{vocab_size // 1000}k'
 
@@ -36,8 +36,8 @@ def normalize_text(text):
     return re.sub(r'\n+ ', '\n', re.sub(r'[\t  ]+', ' ', text))
 
 
-def show_examples(dataset, tokenizer):
-    test_samples = dataset.take(5)
+def show_examples(dataset, tokenizer, num_examples=5):
+    test_samples = dataset.take(num_examples)
     for example in test_samples:
         text = ' '.join(example['text'].split()[:500])
         print(text)

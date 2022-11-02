@@ -16,12 +16,13 @@ def evaluate_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
     """
     print("Preparing dataset")
     # preprocess multilingual legal dataset
-    test_datasets = preprocess_dataset(languages=languages, domain_types=domain_types,
-                                       return_test_subsets=True)
+    test_datasets = preprocess_dataset(languages=languages, domain_types=domain_types, return_test_subsets=True)
 
     # Custom Tokenizer
     vocab_tok_folder = get_vocab_tok_folder(languages, vocab_size)
-    if Path(vocab_tok_folder).exists():
+    if not Path(vocab_tok_folder).exists():
+        print(f"Custom tokenizer not found for language '{languages}'. Please train it first.")
+    else:
         print_fragmentation_per_language(test_datasets, vocab_tok_folder)
 
         # XLM-RoBERTa Tokenizer
@@ -31,13 +32,11 @@ def evaluate_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
 
 
 def print_fragmentation_per_language(test_datasets, tokenizer_name):
-    print("Loading tokenizer")
+    print(f"Loading tokenizer {tokenizer_name}")
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)
     fr_text = ''
-    for LANG in test_datasets:
-        dataset = test_datasets[LANG]
+    for LANG, dataset in test_datasets.items():
         # show_examples(dataset, tokenizer)
-
         print(f"Calculating fragmentation ratio (tokens/words) for language `{LANG}`")
 
         def calc_fragmentation(batch):
@@ -50,10 +49,9 @@ def print_fragmentation_per_language(test_datasets, tokenizer_name):
                 fragmentation_ratios.append(len(tokens) / len(words))
             return {'fragmentation_ratio': fragmentation_ratios}
 
-        dataset = dataset.take(DATASET_SIZE).map(calc_fragmentation, batched=True, batch_size=1000)
+        dataset = dataset.map(calc_fragmentation, batched=True, batch_size=1000)
 
-        fragmentation_ratios = copy.deepcopy([example['fragmentation_ratio'] for example in list(dataset)])
-        fr_text += f'{LANG}: {np.mean(fragmentation_ratios):.2f}\t'
+        fr_text += f'{LANG}: {np.mean(dataset["fragmentation_ratio"]):.2f}\t'
         print(fr_text)
     print(f'{tokenizer_name} Tokenizer (vocab size: {tokenizer.vocab_size}) '
           f'fragmentation ratios (tokens / words): {fr_text}')
