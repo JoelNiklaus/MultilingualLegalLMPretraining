@@ -1,10 +1,11 @@
+import copy
 from pathlib import Path
 
 from transformers import AutoTokenizer
 import numpy as np
 from preprocess_dataset import preprocess_dataset
 from src.pretraining.tokenizer_utils import get_vocab_tok_folder, comparison_tokenizers
-
+DATASET_SIZE = 1000
 
 def evaluate_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
     """
@@ -43,12 +44,12 @@ def print_fragmentation_per_language(multilingual_legal_dataset_test_subsets, to
                 fragmentation_ratios.append(len(tokens) / len(words))
             return {'fragmentation_ratio': fragmentation_ratios}
 
-        multilingual_legal_dataset_test_subsets[LANG] = multilingual_legal_dataset_test_subsets[LANG].map(
+        multilingual_legal_dataset_test_subsets[LANG] = multilingual_legal_dataset_test_subsets[LANG].take(DATASET_SIZE).map(
             calc_fragmentation, batched=True, batch_size=1000
         )
 
-        fragmentation_ratios = [example['fragmentation_ratio'] for example in
-                                list(multilingual_legal_dataset_test_subsets[LANG])]
+        fragmentation_ratios = copy.deepcopy([example['fragmentation_ratio'] for example in
+                                              list(multilingual_legal_dataset_test_subsets[LANG])])
         fr_text += f'{LANG}: {np.mean(fragmentation_ratios):.2f}\t'
     print(f'{tokenizer_name} Tokenizer (vocab size: {tokenizer.vocab_size}) '
           f'fragmentation ratios (tokens / words): {fr_text}')
