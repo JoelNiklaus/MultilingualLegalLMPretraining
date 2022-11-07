@@ -19,7 +19,8 @@ def preprocess_dataset(languages=None, domain_types=None, use_interleave_dataset
             try:
                 dataset = load_dataset("joelito/Multi_Legal_Pile", f'{LANG}_{DOMAIN_TYPE}',
                                        split='train', streaming=True, use_auth_token=True)
-                dataset = dataset.filter(lambda example: example['text'] and len(example['text']) > 0)
+                if use_interleave_datasets:
+                    dataset = dataset.filter(lambda example: example['text'] and len(example['text']) > 0)
 
                 print(f'Found data for `{DOMAIN_TYPE}` in language `{LANG}`.')
                 print("Example: ", list(dataset.take(1)))

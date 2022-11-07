@@ -20,11 +20,13 @@ def batch_iterator(dataset):
     yield 'End'
 
 
-def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
+def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None, lowercase=True):
     # configure tokenizer
     backend_tokenizer = Tokenizer(models.BPE(unk_token="<unk>"))  # WordPiece for BERT
+    # benefit of mixed case is probably not worth losing so much capacity in the vocabulary
+    # we could do an experiment with both lowercase and mixed case tokenizers
     backend_tokenizer.normalizer = normalizers.Sequence(
-        [normalizers.NFKD(), normalizers.BertNormalizer(lowercase=False)])
+        [normalizers.NFKD(), normalizers.BertNormalizer(lowercase=lowercase)])
     backend_tokenizer.pre_tokenizer = pre_tokenizers.Sequence(
         [pre_tokenizers.BertPreTokenizer(), pre_tokenizers.ByteLevel(add_prefix_space=True)])
     backend_tokenizer.decoder = decoders.ByteLevel()  # WordPiece for BERT

@@ -1,3 +1,4 @@
+import glob
 import json
 import tqdm
 import os
@@ -9,6 +10,9 @@ from src.pretraining.preprocess_dataset import preprocess_dataset
 
 MAX_SEQ_LENGTH = 500
 GOAL_SEQUENCES_NUMBER = 6e8
+VALIDATION_SIZE = GOAL_SEQUENCES_NUMBER // 1000
+
+chunk_dir = os.path.join(DATA_DIR, 'mlm_dataset', 'chunks_512')
 
 
 def write_samples(dataset_number):
@@ -18,9 +22,8 @@ def write_samples(dataset_number):
     temp_count = 0
     all_samples = 0
     file_number = 1
-    out_file = open(
-        os.path.join(DATA_DIR, 'mlm_dataset', 'chunks_512', f'{dataset_name}_train_{file_number}.jsonl'),
-        'w', encoding='utf8')
+    save_train = False
+    out_file = open(os.path.join(chunk_dir, f'{dataset_name}_validation_{file_number}.jsonl'), 'w', encoding='utf8')
     print(f'Processing for dataset {dataset_name} started!')
     # Read each document
     for sample in tqdm.tqdm(dataset):
@@ -39,18 +42,25 @@ def write_samples(dataset_number):
                     print(f'Processing for dataset {dataset_name} finished early with {total_count}/{all_samples}!')
                     return
                 all_samples += 1
-                if temp_count > 1000000:
+                if not save_train and temp_count > VALIDATION_SIZE:
+                    out_file.close()
+                    temp_count = 0
+                    total_count = 0
+                    save_train = True
+                    out_file = open(os.path.join(chunk_dir, f'{dataset_name}_train_{file_number}.jsonl'), 'w',
+                                    encoding='utf8')
+                if temp_count > 1000000:  # on average approx. 1GB per file
                     out_file.close()
                     file_number += 1
                     temp_count = 0
-                    out_file = open(os.path.join(DATA_DIR, 'mlm_dataset', 'chunks_512',
-                                                 f'{dataset_name}_train_{file_number}.jsonl'), 'w',
+                    out_file = open(os.path.join(chunk_dir, f'{dataset_name}_train_{file_number}.jsonl'), 'w',
                                     encoding='utf8')
                 # Join 500 tokens in a sequence
                 sample_text = ' '.join(ws_tokens[prev_idx:idx])
                 prev_idx = idx
                 # Compute percentage of alphabetical characters in relation to full sequence length
-                alpha_text = re.sub(r'[^a-zA-Z ]', '', sample_text)
+                punctuation = '!\"#$%&\'()*+,\-\./:;<=>?@\[\\\]\^_`{\|}~'
+                alpha_text = re.sub(rf'[{punctuation}\d]', '', sample_text)  # remove numbers and punctuation
                 alpha_percent = len(alpha_text) / len(sample_text)
                 # Compute total chunk length
                 text_length = len(sample_text.split())
@@ -74,17 +84,26 @@ def write_samples(dataset_number):
 
 def split_documents():
     ''' set default hyperparams in default_hyperparams.py '''
-
     # Load all datasets across languages and types
-    datasets, sampling_scores = preprocess_dataset(use_interleave_datasets=False)
+    datasets, sampling_scores = preprocess_dataset(languages=["it"], use_interleave_datasets=False)
     # Shuffle datasets to pick and write up to N entries (GOAL_SEQUENCES_NUMBER * sampling_score) that are going to be used.
-    datasets = [(dataset.shuffle(seed=42, buffer_size=100_000), int(GOAL_SEQUENCES_NUMBER * sampling_score), dataset.config_name)
+    datasets = [(dataset.shuffle(seed=42),  # buffer_size=100_000),
+                 int(GOAL_SEQUENCES_NUMBER * sampling_score),
+                 dataset.config_name)
                 for dataset, sampling_score in zip(datasets, sampling_scores)]
 
+    for dataset in tqdm.tqdm(datasets):
+        write_samples(dataset)
     # Launch pool to preprocess all datasets in parallel
-    p = Pool(len(datasets))
-    p.map(write_samples, datasets)
-    p.close()
+    # parallelism does not work with iterable datasets
+    # p = Pool(len(datasets))
+    # p.map(write_samples, datasets)
+    # p.close()
+
+    # Compress datasets
+    print(f"Compressing datasets at {chunk_dir}")
+    for path in glob.glob(os.path.join(chunk_dir, '*.jsonl')):
+        os.system(f'xz -zkf -T0 {path}')  # -TO to use multithreading
 
 
 if __name__ == '__main__':
