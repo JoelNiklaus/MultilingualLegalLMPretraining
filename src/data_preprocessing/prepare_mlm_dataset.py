@@ -74,7 +74,7 @@ def write_samples(dataset_number):
 
 def split_documents():
     ''' set default hyperparams in default_hyperparams.py '''
-c
+
     # Load all datasets across languages and types
     datasets, sampling_scores = preprocess_dataset(use_interleave_datasets=False)
     # Shuffle datasets to pick and write up to N entries (GOAL_SEQUENCES_NUMBER * sampling_score) that are going to be used.
