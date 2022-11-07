@@ -5,7 +5,7 @@ _LANGUAGES = ['bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga',
 _DOMAIN_TYPES = ['legislation', 'caselaw', 'contracts', 'other']
 
 
-def preprocess_dataset(languages=None, domain_types=None, return_test_subsets=False):
+def preprocess_dataset(languages=None, domain_types=None, use_interleave_datasets=True, return_test_subsets=False):
     # combine datasets into a large interleaved dataset
     datasets = []
     sampling_scores = []
@@ -35,6 +35,9 @@ def preprocess_dataset(languages=None, domain_types=None, return_test_subsets=Fa
     # normalize sampling scores across languages
     sampling_scores = [sampling_score / sum(sampling_scores) for sampling_score in sampling_scores]
     print("Sampling Scores: ", {dataset.config_name: sr for dataset, sr in zip(datasets, sampling_scores)})
+
+    if not use_interleave_datasets:
+        return datasets, sampling_scores
 
     # interleave datasets with sampling rates into a single dataset
     print("Interleaving datasets")
