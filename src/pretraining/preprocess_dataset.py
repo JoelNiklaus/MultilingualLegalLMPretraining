@@ -23,7 +23,7 @@ def preprocess_dataset(languages=None, domain_types=None, use_interleave_dataset
                     dataset = dataset.filter(lambda example: example['text'] and len(example['text']) > 0)
 
                 print(f'Found data for `{DOMAIN_TYPE}` in language `{LANG}`.')
-                print("Example: ", list(dataset.take(1)))
+                # print("Example: ", list(dataset.take(1)))
             except:
                 print(f'There is no data for `{DOMAIN_TYPE}` in language `{LANG}`.')
                 continue

@@ -4,12 +4,14 @@ import tqdm
 import os
 import re
 from multiprocessing import Pool
+
+from datasets import IterableDataset
 from tokenizers import normalizers
 from data import DATA_DIR
 from src.pretraining.preprocess_dataset import preprocess_dataset
 
 MAX_SEQ_LENGTH = 500
-GOAL_SEQUENCES_NUMBER = 6e8
+GOAL_SEQUENCES_NUMBER = float('inf')  # set to a lower number to limit the maximum number of examples
 VALIDATION_SIZE = GOAL_SEQUENCES_NUMBER // 1000
 
 chunk_dir = os.path.join(DATA_DIR, 'mlm_dataset', 'chunks_512')
@@ -82,23 +84,25 @@ def write_samples(dataset_number):
     return
 
 
-def split_documents():
+def split_documents(use_sampling_scores=False):
     ''' set default hyperparams in default_hyperparams.py '''
     # Load all datasets across languages and types
-    datasets, sampling_scores = preprocess_dataset(languages=["it"], use_interleave_datasets=False)
+    datasets, sampling_scores = preprocess_dataset(use_interleave_datasets=False)
     # Shuffle datasets to pick and write up to N entries (GOAL_SEQUENCES_NUMBER * sampling_score) that are going to be used.
-    datasets = [(dataset.shuffle(seed=42),  # buffer_size=100_000),
-                 int(GOAL_SEQUENCES_NUMBER * sampling_score),
+    datasets = [(dataset.shuffle(seed=42, buffer_size=10_000),
+                 int(GOAL_SEQUENCES_NUMBER * sampling_score) if use_sampling_scores else GOAL_SEQUENCES_NUMBER,
                  dataset.config_name)
                 for dataset, sampling_score in zip(datasets, sampling_scores)]
 
-    for dataset in tqdm.tqdm(datasets):
-        write_samples(dataset)
-    # Launch pool to preprocess all datasets in parallel
-    # parallelism does not work with iterable datasets
-    # p = Pool(len(datasets))
-    # p.map(write_samples, datasets)
-    # p.close()
+    if isinstance(datasets[0], IterableDataset):
+        # Launch pool to preprocess all datasets in parallel
+        p = Pool(len(datasets))
+        p.map(write_samples, datasets)
+        p.close()
+    else:
+        # parallelism does not work with iterable datasets
+        for dataset in tqdm.tqdm(datasets):
+            write_samples(dataset)
 
     # Compress datasets
     print(f"Compressing datasets at {chunk_dir}")
