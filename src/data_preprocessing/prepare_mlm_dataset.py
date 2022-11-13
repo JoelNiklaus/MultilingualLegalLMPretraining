@@ -5,14 +5,13 @@ import os
 import re
 from multiprocessing import Pool
 
-from datasets import IterableDataset
 from tokenizers import normalizers
 from data import DATA_DIR
 from src.pretraining.preprocess_dataset import preprocess_dataset
 
 MAX_SEQ_LENGTH = 500
 GOAL_SEQUENCES_NUMBER = float('inf')  # set to a lower number to limit the maximum number of examples
-VALIDATION_SIZE = GOAL_SEQUENCES_NUMBER // 1000
+VALIDATION_SIZE = 10_000  # ~10MB per configuration
 
 chunk_dir = os.path.join(DATA_DIR, 'mlm_dataset', 'chunks_512')
 
@@ -20,12 +19,9 @@ chunk_dir = os.path.join(DATA_DIR, 'mlm_dataset', 'chunks_512')
 def write_samples(dataset_number):
     custom_normalizer = normalizers.NFKD()
     dataset, dataset_goal_number, dataset_name = dataset_number
-    total_count = 0
-    temp_count = 0
-    all_samples = 0
+    total_count, temp_count, all_samples = 0, 0, 0
     file_number = 1
-    save_train = False
-    out_file = open(os.path.join(chunk_dir, f'{dataset_name}_validation_{file_number}.jsonl'), 'w', encoding='utf8')
+    out_file = open_file(dataset_name, file_number, "validation")  # we save the first examples to the validation set
     print(f'Processing for dataset {dataset_name} started!')
     # Read each document
     for sample in tqdm.tqdm(dataset):
@@ -43,20 +39,19 @@ def write_samples(dataset_number):
                     out_file.close()
                     print(f'Processing for dataset {dataset_name} finished early with {total_count}/{all_samples}!')
                     return
-                all_samples += 1
-                if not save_train and temp_count > VALIDATION_SIZE:
+                if "validation" in out_file.name and temp_count > VALIDATION_SIZE:
+                    # if we are saving to eval and we have enough samples in the eval set, switch to train
                     out_file.close()
                     temp_count = 0
                     total_count = 0
-                    save_train = True
-                    out_file = open(os.path.join(chunk_dir, f'{dataset_name}_train_{file_number}.jsonl'), 'w',
-                                    encoding='utf8')
-                if temp_count > 1000000:  # on average approx. 1GB per file
+                    out_file = open_file(dataset_name, file_number, "train")
+                # on average approx. 10GB per file, compresses to around 2GB
+                if "train" in out_file.name and temp_count > 10_000_000:
+                    # if we are saving to train and we reached the max size per file, switch to the next file
                     out_file.close()
                     file_number += 1
                     temp_count = 0
-                    out_file = open(os.path.join(chunk_dir, f'{dataset_name}_train_{file_number}.jsonl'), 'w',
-                                    encoding='utf8')
+                    out_file = open_file(dataset_name, file_number, "train")
                 # Join 500 tokens in a sequence
                 sample_text = ' '.join(ws_tokens[prev_idx:idx])
                 prev_idx = idx
@@ -72,6 +67,7 @@ def write_samples(dataset_number):
                                                "type": sample["type"], "jurisdiction": sample["jurisdiction"]}) + '\n')
                     total_count += 1
                     temp_count += 1
+                all_samples += 1
         except:
             continue
 
@@ -84,6 +80,10 @@ def write_samples(dataset_number):
     return
 
 
+def open_file(dataset_name, file_number, split):
+    return open(os.path.join(chunk_dir, f'{dataset_name}_{split}_{file_number}.jsonl'), 'w', encoding='utf8')
+
+
 def split_documents(use_sampling_scores=False):
     ''' set default hyperparams in default_hyperparams.py '''
     # Load all datasets across languages and types
@@ -94,21 +94,21 @@ def split_documents(use_sampling_scores=False):
                  dataset.config_name)
                 for dataset, sampling_score in zip(datasets, sampling_scores)]
 
-    if isinstance(datasets[0], IterableDataset):
-        # Launch pool to preprocess all datasets in parallel
-        p = Pool(len(datasets))
-        p.map(write_samples, datasets)
-        p.close()
-    else:
-        # parallelism does not work with iterable datasets
-        for dataset in tqdm.tqdm(datasets):
-            write_samples(dataset)
+    # Launch pool to preprocess all datasets in parallel
+    p = Pool(len(datasets))
+    p.map(write_samples, datasets)
+    p.close()
 
     # Compress datasets
     print(f"Compressing datasets at {chunk_dir}")
     for path in glob.glob(os.path.join(chunk_dir, '*.jsonl')):
         os.system(f'xz -zkf -T0 {path}')  # -TO to use multithreading
+        os.system(f'rm {path}')  # remove uncompressed file to save space
 
 
 if __name__ == '__main__':
+    """
+        Run with 
+        export PYTHONPATH=. && python src/data_preprocessing/prepare_mlm_dataset.py | tee prepare_mlm_dataset.log
+        """
     split_documents()
