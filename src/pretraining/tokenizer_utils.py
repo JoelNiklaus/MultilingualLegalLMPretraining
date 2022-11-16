@@ -34,13 +34,35 @@ isocode2lang = {
 }
 
 comparison_tokenizers = {
-    'en': 'bert-base-uncased',
-    'fr': 'camembert-base',
-    'de': 'bert-base-german-cased',
-    'it': 'dbmdz/bert-base-italian-xxl-cased',
-    'es': 'dccuchile/bert-base-spanish-wwm-cased',
-    'pt': 'neuralmind/bert-base-portuguese-cased',
+    "bg": "iarfmoose/roberta-base-bulgarian",
+    "cs": None,
+    "da": "Maltehb/danish-bert-botxo",
+    "de": "dbmdz/bert-base-german-cased",  # deepset/gbert-base
+    "el": "nlpaueb/bert-base-greek-uncased-v1",
+    "en": "roberta-base",  # etc.
+    "es": "bertin-project/bertin-roberta-base-spanish",  # PlanTL-GOB-ES/roberta-base-bne
+    "et": None,
+    "fi": "TurkuNLP/bert-base-finnish-cased-v1",
+    "fr": "camembert-base",  # dbmdz/bert-base-french-europeana-cased
+    "ga": "DCU-NLP/bert-base-irish-cased-v1",
+    "hr": None,
+    "hu": None,
+    "it": "Musixmatch/umberto-commoncrawl-cased-v1",  # dbmdz/bert-base-italian-xxl-cased
+    "lt": None,
+    "lv": None,
+    "mt": None,
+    "nl": "bert-base-dutch-cased",
+    "pl": "dkleczek/bert-base-polish-uncased-v1",
+    "pt": "neuralmind/bert-base-portuguese-cased",
+    "ro": "dumitrescustefan/bert-base-romanian-uncased-v1",
+    "sk": "gerulata/slovakbert",
+    "sl": None,
+    "sv": "KB/bert-base-swedish-cased",
 }
+
+
+def get_comparison_tokenizer(languages):
+    return comparison_tokenizers[languages[0]] if languages and len(languages) == 1 else 'xlm-roberta-base'
 
 
 def get_vocab_tok_folder(languages, vocab_size):

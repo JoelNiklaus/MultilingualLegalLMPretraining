@@ -1,10 +1,9 @@
-import copy
 from pathlib import Path
 
 from transformers import AutoTokenizer
 import numpy as np
 from preprocess_dataset import preprocess_dataset
-from src.pretraining.tokenizer_utils import get_vocab_tok_folder, comparison_tokenizers, show_examples
+from src.pretraining.tokenizer_utils import get_vocab_tok_folder, get_comparison_tokenizer
 
 DATASET_SIZE = 1000  # increase to get a better estimate, decrease to get a faster estimate
 
@@ -26,8 +25,7 @@ def evaluate_tokenizer(vocab_size=64_000, languages=None, domain_types=None):
         print_fragmentation_per_language(test_datasets, vocab_tok_folder)
 
         # XLM-RoBERTa Tokenizer
-        comparison_tokenizer = comparison_tokenizers[languages[0]] \
-            if languages and len(languages) == 1 else 'xlm-roberta-base'
+        comparison_tokenizer = get_comparison_tokenizer(languages)
         print_fragmentation_per_language(test_datasets, comparison_tokenizer)
 
 
