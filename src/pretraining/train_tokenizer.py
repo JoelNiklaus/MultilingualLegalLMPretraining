@@ -21,6 +21,8 @@ def batch_iterator(dataset):
 
 
 def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None, lowercase=True):
+    print(f"Training tokenizer for languages {languages} and domain types {domain_types}")
+
     # configure tokenizer
     backend_tokenizer = Tokenizer(models.BPE(unk_token="<unk>"))  # WordPiece for BERT
     # benefit of mixed case is probably not worth losing so much capacity in the vocabulary

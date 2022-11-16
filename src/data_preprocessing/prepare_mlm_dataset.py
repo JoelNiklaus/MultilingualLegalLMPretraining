@@ -11,7 +11,7 @@ from src.pretraining.preprocess_dataset import preprocess_dataset
 
 MAX_SEQ_LENGTH = 500
 GOAL_SEQUENCES_NUMBER = float('inf')  # set to a lower number to limit the maximum number of examples
-VALIDATION_SIZE = 10_000  # ~10MB per configuration
+VALIDATION_SIZE = 10_000  # ~10MB per configuration ==> some low-resource configs will only have a validation file
 
 chunk_dir = os.path.join(DATA_DIR, 'mlm_dataset', 'chunks_512')
 
@@ -45,9 +45,9 @@ def write_samples(dataset_number):
                     temp_count = 0
                     total_count = 0
                     out_file = open_file(dataset_name, file_number, "train")
-                # on average approx. 10GB per file, compresses to around 2GB
-                if "train" in out_file.name and temp_count > 10_000_000:
-                    # if we are saving to train and we reached the max size per file, switch to the next file
+                # on average approx. 10GB per file, compresses (with xz) to around ~2-3GB (xz: ~75% compression ratio)
+                if "train" in out_file.name and temp_count > 5_000_000:
+                    # if we are saving to train, and we reached the max size per file, switch to the next file
                     out_file.close()
                     file_number += 1
                     temp_count = 0
@@ -74,8 +74,8 @@ def write_samples(dataset_number):
     try:
         out_file.close()
     except:
-        print(f'Processing for dataset {dataset_name} finished with {total_count}/{all_samples}!')
-        return
+        pass
+
     print(f'Processing for dataset {dataset_name} finished with {total_count}/{all_samples}!')
     return
 
@@ -101,6 +101,7 @@ def split_documents(use_sampling_scores=False):
 
     # Compress datasets
     print(f"Compressing datasets at {chunk_dir}")
+    # Do this at the end because we use multithreading
     for path in glob.glob(os.path.join(chunk_dir, '*.jsonl')):
         os.system(f'xz -zkf -T0 {path}')  # -TO to use multithreading
         os.system(f'rm {path}')  # remove uncompressed file to save space
@@ -108,7 +109,7 @@ def split_documents(use_sampling_scores=False):
 
 if __name__ == '__main__':
     """
-        Run with 
-        export PYTHONPATH=. && python src/data_preprocessing/prepare_mlm_dataset.py | tee prepare_mlm_dataset.log
-        """
+    Run with 
+    export PYTHONPATH=. && python src/data_preprocessing/prepare_mlm_dataset.py | tee prepare_mlm_dataset.log
+    """
     split_documents()
