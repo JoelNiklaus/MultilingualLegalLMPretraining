@@ -7,12 +7,30 @@ PLM_FOLDER = os.path.join(DATA_DIR, 'plms')
 CUSTOM_TOK_FOLDER = os.path.join(PLM_FOLDER, 'legal-xlm-base')
 
 isocode2lang = {
-    'en': 'english',
-    'fr': 'french',
+    'bg': 'bulgarian',
+    'cs': 'czech',
+    'da': 'danish',
     'de': 'german',
-    'it': 'italian',
+    'el': 'greek',
+    'en': 'english',
     'es': 'spanish',
+    'et': 'estonian',
+    'fi': 'finnish',
+    'fr': 'french',
+    'ga': 'irish',
+    'hr': 'croatian',
+    'hu': 'hungarian',
+    'it': 'italian',
+    'lt': 'lithuanian',
+    'lv': 'latvian',
+    'mt': 'maltese',
+    'nl': 'dutch',
+    'pl': 'polish',
     'pt': 'portuguese',
+    'ro': 'romanian',
+    'sk': 'slovak',
+    'sl': 'slovenian',
+    'sv': 'swedish',
 }
 
 comparison_tokenizers = {
