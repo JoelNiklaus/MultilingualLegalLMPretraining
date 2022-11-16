@@ -20,8 +20,8 @@ def batch_iterator(dataset):
     yield 'End'
 
 
-def train_tokenizers(vocab_size=64_000, languages=None, domain_types=None, lowercase=True):
-    print(f"Training tokenizer for languages {languages} and domain types {domain_types}")
+def train_tokenizer(vocab_size=64_000, languages=None, domain_types=None, lowercase=True):
+    print(f"Training tokenizer for languages {languages}, domain types {domain_types} and vocabulary size {vocab_size}")
 
     # configure tokenizer
     backend_tokenizer = Tokenizer(models.BPE(unk_token="<unk>"))  # WordPiece for BERT
@@ -89,8 +89,8 @@ if __name__ == "__main__":
     """
     vocab_sizes = [32000, 64000, 128000]
     # vocab_sizes = [32000]
-    languages = [['de'], ['fr'], ['it'], None]  # None is for all languages
-    # languages = [['it']]
+    languages = [['de'], ['fr'], ['it'], ['es'], ['pt'], None]  # None is for all languages
+    # languages = [['it', 'fr']]
     for language in languages:
         for vocab_size in vocab_sizes:
-            train_tokenizers(vocab_size=vocab_size, languages=language)
+            train_tokenizer(vocab_size=vocab_size, languages=language)

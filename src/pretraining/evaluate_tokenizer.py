@@ -9,7 +9,7 @@ from src.pretraining.tokenizer_utils import get_vocab_tok_folder, comparison_tok
 DATASET_SIZE = 1000  # increase to get a better estimate, decrease to get a faster estimate
 
 
-def evaluate_tokenizers(vocab_size=64_000, languages=None, domain_types=None):
+def evaluate_tokenizer(vocab_size=64_000, languages=None, domain_types=None):
     """
     Compare different tokenizers
     :return:
@@ -64,8 +64,8 @@ if __name__ == "__main__":
     """
     vocab_sizes = [32000, 64000, 128000]
     # vocab_sizes = [32000]
-    languages = [['de'], ['fr'], ['it'], None]  # None is for all languages
+    languages = [['de'], ['fr'], ['it'], ['es'], ['pt'], None]  # None is for all languages
     # languages = [['de', 'fr']]
     for language in languages:
         for vocab_size in vocab_sizes:
-            evaluate_tokenizers(vocab_size=vocab_size, languages=language)
+            evaluate_tokenizer(vocab_size=vocab_size, languages=language)

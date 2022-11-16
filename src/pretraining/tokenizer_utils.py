@@ -26,7 +26,7 @@ comparison_tokenizers = {
 
 
 def get_vocab_tok_folder(languages, vocab_size):
-    lang = f"{isocode2lang[languages[0]]}-bert" if languages or len(languages) == 1 else 'xlm'
+    lang = f"{isocode2lang[languages[0]]}-bert" if languages and len(languages) == 1 else 'xlm'
     lang_folder = os.path.join(PLM_FOLDER, f"legal-{lang}-base")
     return lang_folder + f'_{vocab_size // 1000}k'
 

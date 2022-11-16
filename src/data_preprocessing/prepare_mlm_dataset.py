@@ -87,7 +87,7 @@ def open_file(dataset_name, file_number, split):
 def split_documents(use_sampling_scores=False):
     ''' set default hyperparams in default_hyperparams.py '''
     # Load all datasets across languages and types
-    datasets, sampling_scores = preprocess_dataset(use_interleave_datasets=False)
+    datasets, sampling_scores = preprocess_dataset(languages=None, domain_types=None, use_interleave_datasets=False)
     # Shuffle datasets to pick and write up to N entries (GOAL_SEQUENCES_NUMBER * sampling_score) that are going to be used.
     datasets = [(dataset.shuffle(seed=42, buffer_size=10_000),
                  int(GOAL_SEQUENCES_NUMBER * sampling_score) if use_sampling_scores else GOAL_SEQUENCES_NUMBER,
