@@ -61,9 +61,8 @@ if __name__ == "__main__":
     export PYTHONPATH=. && python src/pretraining/evaluate_tokenizer.py | tee evaluate_tokenizer.log
     """
     vocab_sizes = [32000, 64000, 128000]
-    # vocab_sizes = [32000]
-    languages = [['de'], ['fr'], ['it'], ['es'], ['pt'], None]  # None is for all languages
-    # languages = [['de', 'fr']]
+    languages = [['bg'], ['cs'], ['da'], ['de'], ['el'], ['en'], ['es'], ['et'], ['fi'], ['fr'], ['ga'], ['hr'],
+                 ['hu'], ['it'], ['lt'], ['lv'], ['mt'], ['nl'], ['pl'], ['pt'], ['ro'], ['sk'], ['sl'], ['sv'], None]
     for language in languages:
         for vocab_size in vocab_sizes:
             evaluate_tokenizer(vocab_size=vocab_size, languages=language)
