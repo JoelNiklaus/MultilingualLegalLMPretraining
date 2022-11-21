@@ -23,7 +23,6 @@ https://huggingface.co/models?filter=fill-mask
 import logging
 import math
 import os
-import re
 import random
 import sys
 from dataclasses import dataclass, field
@@ -238,7 +237,7 @@ def main():
 
     # Streaming dataset
     raw_datasets = {'train': [], 'test': []}
-    multilingual_legal_dataset = preprocess_dataset()
+    multilingual_legal_dataset = preprocess_dataset(dataset_name=training_args.dataset_name)
     raw_datasets['train'] = multilingual_legal_dataset['train']
     raw_datasets['test'] = multilingual_legal_dataset['test']
 
@@ -436,9 +435,14 @@ def main():
     # Data collator
     # This one will take care of randomly masking the tokens.
     pad_to_multiple_of_8 = data_args.line_by_line and training_args.fp16 and not data_args.pad_to_max_length
-    data_collator = DataCollatorForLanguageModeling(
+    train_data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer,
         mlm_probability=data_args.mlm_probability,
+        pad_to_multiple_of=8 if pad_to_multiple_of_8 else None,
+    )
+    eval_data_collator = DataCollatorForLanguageModeling(
+        tokenizer=tokenizer,
+        mlm_probability=0.15,
         pad_to_multiple_of=8 if pad_to_multiple_of_8 else None,
     )
 
@@ -449,7 +453,8 @@ def main():
         train_dataset=train_dataset if training_args.do_train else None,
         eval_dataset=eval_dataset if training_args.do_eval else None,
         tokenizer=tokenizer,
-        data_collator=data_collator,
+        train_data_collator=train_data_collator,
+        eval_data_collator=eval_data_collator,
         compute_metrics=compute_metrics if training_args.do_eval and not is_torch_tpu_available() else None,
         preprocess_logits_for_metrics=preprocess_logits_for_metrics
         if training_args.do_eval and not is_torch_tpu_available()
