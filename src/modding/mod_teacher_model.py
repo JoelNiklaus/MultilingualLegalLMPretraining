@@ -209,4 +209,8 @@ def warm_start_model():
 
 
 if __name__ == '__main__':
+    """
+    Run with 
+    export PYTHONPATH=. && python src/modding/mod_teacher_model.py | tee mod_teacher_model.log
+    """
     warm_start_model()

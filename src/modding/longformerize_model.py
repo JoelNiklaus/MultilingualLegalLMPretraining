@@ -110,4 +110,8 @@ def convert_roberta_to_htf():
 
 
 if __name__ == '__main__':
+    """
+    Run with 
+    export PYTHONPATH=. && python src/modding/longformerize_model.py | tee longformerize_model.log
+    """
     convert_roberta_to_htf()

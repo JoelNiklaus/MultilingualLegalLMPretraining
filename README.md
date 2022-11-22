@@ -2,21 +2,21 @@
 
 ##  Legal XLM Models trained on the Multilingual Legal Pile
 
-| Model Name                                                                                             | Layers / Units /  Heads | Vocab. | Parameters | 
-|--------------------------------------------------------------------------------------------------------|-------------------------|--------|------------|
-| [`lexlms/legal-xlm-base`](https://huggingface.co/lexlms/legal-xlm-base)                              | 12 / 768 / 12           | 64K    | 110M       | 
-| [`lexlms/legal-xlmr-base`](https://huggingface.co/lexlms/legal-xlmr-base)                            | 12 / 768 / 12           | 64K    | 110M       | 
-| [`lexlms/legal-xlm-longformer-base`](https://huggingface.co/lexlms/legal-xlm-longformer-base)        | 12 / 768 / 12           | 64K    | 134M       |
+| Model Name                                                                                       | Layers / Units /  Heads | Vocab. | Parameters | 
+|:-------------------------------------------------------------------------------------------------|------------------------:|-------:|-----------:|
+| [`lexlms/legal-xlm-base`](https://huggingface.co/lexlms/legal-xlm-base)                          |           12 / 768 / 12 |    64K |       110M | 
+| [`lexlms/legal-xlmr-base`](https://huggingface.co/lexlms/legal-xlmr-base)                        |           12 / 768 / 12 |    64K |       110M | 
+| [`lexlms/legal-xlm-longformer-base`](https://huggingface.co/lexlms/legal-xlm-longformer-base)    |           12 / 768 / 12 |    64K |       134M |
 
 
 ## Benchmarking on the Multilingual Legal Pile
 
-| Model Name                          | Loss | Accuracy | Legal              |
-|-------------------------------------|------|----------|--------------------|
-| `xlm-roberta-base`                  | -    | -        | :x:                |
-| `lexlms/legal-xlm-base`            | -    | -        | :white_check_mark: |
-| `lexlms/legal-xlmr-base`           | -    | -        | :white_check_mark: |
-| `lexlms/legal-xlm-longformer-base` | -    | -        | :white_check_mark: |
+| Model Name                         | Loss | Accuracy |              Legal |
+|:-----------------------------------|-----:|---------:|-------------------:|
+| `xlm-roberta-base`                 |    - |        - |                :x: |
+| `lexlms/legal-xlm-base`            |    - |        - | :white_check_mark: |
+| `lexlms/legal-xlmr-base`           |    - |        - | :white_check_mark: |
+| `lexlms/legal-xlm-longformer-base` |    - |        - | :white_check_mark: |
 
 TODO: Present per language scores
 

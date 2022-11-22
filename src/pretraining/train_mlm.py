@@ -515,4 +515,8 @@ def _mp_fn(index):
 
 
 if __name__ == "__main__":
+    """
+    Run with 
+    export PYTHONPATH=. && python src/pretraining/train_mlm.py | tee train_mlm.log
+    """
     main()
