@@ -63,7 +63,7 @@ from transformers import __version__
 from transformers.configuration_utils import PretrainedConfig
 from transformers.data.data_collator import DataCollator, DataCollatorWithPadding, default_data_collator
 from transformers.debug_utils import DebugOption, DebugUnderflowOverflow
-from transformers.deepspeed import deepspeed_init, deepspeed_reinit, is_deepspeed_zero3_enabled
+from transformers.deepspeed import deepspeed_init, is_deepspeed_zero3_enabled
 from transformers.dependency_versions_check import dep_version_check
 from transformers.modelcard import TrainingSummary
 from transformers.modeling_utils import PreTrainedModel, unwrap_model
@@ -211,8 +211,12 @@ class Trainer:
         args ([`TrainingArguments`], *optional*):
             The arguments to tweak for training. Will default to a basic instance of [`TrainingArguments`] with the
             `output_dir` set to a directory named *tmp_trainer* in the current directory if not provided.
-        data_collator (`DataCollator`, *optional*):
-            The function to use to form a batch from a list of elements of `train_dataset` or `eval_dataset`. Will
+        train_data_collator (`DataCollator`, *optional*):
+            The function to use to form a batch from a list of elements of `train_dataset`. Will
+            default to [`default_data_collator`] if no `tokenizer` is provided, an instance of
+            [`DataCollatorWithPadding`] otherwise.
+        eval_data_collator (`DataCollator`, *optional*):
+            The function to use to form a batch from a list of elements of eval_dataset`. Will
             default to [`default_data_collator`] if no `tokenizer` is provided, an instance of
             [`DataCollatorWithPadding`] otherwise.
         train_dataset (`torch.utils.data.Dataset` or `torch.utils.data.IterableDataset`, *optional*):
@@ -280,7 +284,8 @@ class Trainer:
         self,
         model: Union[PreTrainedModel, nn.Module] = None,
         args: TrainingArguments = None,
-        data_collator: Optional[DataCollator] = None,
+        train_data_collator: Optional[DataCollator] = None,
+        eval_data_collator: Optional[DataCollator] = None,
         train_dataset: Optional[Dataset] = None,
         eval_dataset: Optional[Dataset] = None,
         tokenizer: Optional[PreTrainedTokenizerBase] = None,
@@ -305,7 +310,7 @@ class Trainer:
 
         if self.freeze_model_encoder:
             logger.info('Model\'s encoder will remain frozen in 20% initial steps!!!')
-            print('HEREEE::: Model\'s encoder will remain frozen in 20% initial steps!!!')
+            print('Model\'s encoder will remain frozen in 20% initial steps!!!')
             for param in model.base_model.encoder.parameters():
                 param.requires_grad = False
             model.base_model.encoder.training = False
@@ -382,7 +387,8 @@ class Trainer:
             self.place_model_on_device = False
 
         default_collator = default_data_collator if tokenizer is None else DataCollatorWithPadding(tokenizer)
-        self.data_collator = data_collator if data_collator is not None else default_collator
+        self.train_data_collator = train_data_collator if train_data_collator is not None else default_collator
+        self.eval_data_collator = eval_data_collator if eval_data_collator is not None else default_collator
         self.train_dataset = train_dataset
         self.eval_dataset = eval_dataset
         self.tokenizer = tokenizer
@@ -428,7 +434,7 @@ class Trainer:
         if self.args.should_save:
             os.makedirs(self.args.output_dir, exist_ok=True)
 
-        if not callable(self.data_collator) and callable(getattr(self.data_collator, "collate_batch", None)):
+        if not callable(self.train_data_collator) and callable(getattr(self.train_data_collator, "collate_batch", None)):
             raise ValueError("The `data_collator` should be a simple callable (function, class with `__call__`).")
 
         if args.max_steps > 0:
@@ -691,7 +697,7 @@ class Trainer:
             return DataLoader(
                 train_dataset,
                 batch_size=self.args.per_device_train_batch_size,
-                collate_fn=self.data_collator,
+                collate_fn=self.train_data_collator,
                 num_workers=self.args.dataloader_num_workers,
                 pin_memory=self.args.dataloader_pin_memory,
             )
@@ -702,7 +708,7 @@ class Trainer:
             train_dataset,
             batch_size=self.args.train_batch_size,
             sampler=train_sampler,
-            collate_fn=self.data_collator,
+            collate_fn=self.train_data_collator,
             drop_last=self.args.dataloader_drop_last,
             num_workers=self.args.dataloader_num_workers,
             pin_memory=self.args.dataloader_pin_memory,
@@ -767,7 +773,7 @@ class Trainer:
             return DataLoader(
                 eval_dataset,
                 batch_size=self.args.eval_batch_size,
-                collate_fn=self.data_collator,
+                collate_fn=self.eval_data_collator,
                 num_workers=self.args.dataloader_num_workers,
                 pin_memory=self.args.dataloader_pin_memory,
             )
@@ -778,7 +784,7 @@ class Trainer:
             eval_dataset,
             sampler=eval_sampler,
             batch_size=self.args.eval_batch_size,
-            collate_fn=self.data_collator,
+            collate_fn=self.eval_data_collator,
             drop_last=self.args.dataloader_drop_last,
             num_workers=self.args.dataloader_num_workers,
             pin_memory=self.args.dataloader_pin_memory,
@@ -810,7 +816,7 @@ class Trainer:
             return DataLoader(
                 test_dataset,
                 batch_size=self.args.eval_batch_size,
-                collate_fn=self.data_collator,
+                collate_fn=self.eval_data_collator,
                 num_workers=self.args.dataloader_num_workers,
                 pin_memory=self.args.dataloader_pin_memory,
             )
@@ -822,7 +828,7 @@ class Trainer:
             test_dataset,
             sampler=test_sampler,
             batch_size=self.args.eval_batch_size,
-            collate_fn=self.data_collator,
+            collate_fn=self.eval_data_collator,
             drop_last=self.args.dataloader_drop_last,
             pin_memory=self.args.dataloader_pin_memory,
         )
@@ -1501,10 +1507,13 @@ class Trainer:
                     model.zero_grad()
                     self.state.global_step += 1
                     # Re-activate encoder updated
-                    if self.freeze_model_encoder and self.state.global_step / max_steps >= self.args.warmup_ratio:
+                    if self.freeze_model_encoder and ((self.state.global_step / max_steps) >= (self.args.warmup_ratio * 0.5)):
                         for param in model.base_model.encoder.parameters():
                             param.requires_grad = True
                         model.base_model.encoder.training = True
+                        self.freeze_model_encoder = False
+                        logger.info('ENCODER DE-FROSTED!!!!')
+                        print('ENCODER DE-FROSTED!!!!')
 
                     self.state.epoch = epoch + (step + 1) / steps_in_epoch
                     self.control = self.callback_handler.on_step_end(args, self.state, self.control)
@@ -1558,7 +1567,7 @@ class Trainer:
             if os.path.exists(best_model_path):
                 if self.deepspeed:
                     # temp hack until Deepspeed fixes the problem with resume from an existing engine that did some stepping
-                    deepspeed_engine, optimizer, lr_scheduler = deepspeed_reinit(self)
+                    deepspeed_engine, optimizer, lr_scheduler = deepspeed_init(self)
                     self.model = deepspeed_engine.module
                     self.model_wrapped = deepspeed_engine
                     self.deepspeed = deepspeed_engine

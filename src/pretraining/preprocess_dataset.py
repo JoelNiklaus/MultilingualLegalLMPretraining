@@ -5,7 +5,7 @@ _LANGUAGES = ['bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga',
 _DOMAIN_TYPES = ['legislation', 'caselaw', 'contracts', 'other']
 
 
-def preprocess_dataset(languages=None, domain_types=None, use_interleave_datasets=True, return_test_subsets=False):
+def preprocess_dataset(dataset_name='joelito/Multi_Legal_Pile', languages=None, domain_types=None, use_interleave_datasets=True, return_test_subsets=False):
     # combine datasets into a large interleaved dataset
     datasets = []
     sampling_scores = []
@@ -17,7 +17,7 @@ def preprocess_dataset(languages=None, domain_types=None, use_interleave_dataset
     for LANG in languages:
         for DOMAIN_TYPE in domain_types:
             try:
-                dataset = load_dataset("joelito/Multi_Legal_Pile", f'{LANG}_{DOMAIN_TYPE}',
+                dataset = load_dataset(dataset_name, f'{LANG}_{DOMAIN_TYPE}',
                                        split='train', streaming=True, use_auth_token=True)
                 if use_interleave_datasets:
                     dataset = dataset.filter(lambda example: example['text'] and len(example['text']) > 0)

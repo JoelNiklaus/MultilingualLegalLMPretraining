@@ -19,7 +19,7 @@ def warm_start_model():
     # Required arguments
     parser.add_argument('--teacher_model_path', default='xlm-roberta-base')
     parser.add_argument('--teacher_start', default='▁') # how new tokens start for teacher model, '' for BERT models
-    parser.add_argument('--student_model_path', default=os.path.join(DATA_DIR, 'plms', 'legal-xlm-base')) # for training from scratch
+    parser.add_argument('--student_model_path', default=os.path.join(DATA_DIR, 'plms', 'legal-xlm-base_128k')) # for training from scratch
     parser.add_argument('--student_start', default='Ġ') # how new tokens start for student model
     parser.add_argument('--use_flota', default=True)
     parser.add_argument('--flota_mode', default='longest', choices=['flota', 'longest', 'first'])

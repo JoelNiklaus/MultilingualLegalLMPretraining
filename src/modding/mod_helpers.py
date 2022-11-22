@@ -7,8 +7,8 @@ def mod_roberta(teacher_model, student_model, student_teacher_mapping_ids):
     # copy positional and token type embeddings
     student_model.roberta.embeddings.position_embeddings. \
         load_state_dict(teacher_model.roberta.embeddings.position_embeddings.state_dict())
-    student_model.roberta.embeddings.token_type_embeddings. \
-        load_state_dict(teacher_model.roberta.embeddings.token_type_embeddings.state_dict())
+    student_model.roberta.embeddings.token_type_embeddings.weight[0] = \
+        teacher_model.roberta.embeddings.token_type_embeddings.weight.detach()[0]
     student_model.roberta.embeddings.LayerNorm. \
         load_state_dict(teacher_model.roberta.embeddings.LayerNorm.state_dict())
 
