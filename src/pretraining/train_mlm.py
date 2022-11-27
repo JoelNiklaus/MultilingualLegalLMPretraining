@@ -39,7 +39,6 @@ from transformers import (
     AutoConfig,
     AutoModelForMaskedLM,
     AutoTokenizer,
-    DataCollatorForLanguageModeling,
     HfArgumentParser,
     TrainingArguments,
     is_torch_tpu_available,
@@ -52,6 +51,7 @@ from transformers.trainer_utils import get_last_checkpoint
 from transformers.utils import check_min_version
 from transformers.utils.versions import require_version
 from preprocess_dataset import preprocess_dataset
+from data_collator import DataCollatorForLanguageModeling
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
 check_min_version("4.18.0")
@@ -442,7 +442,7 @@ def main():
     )
     eval_data_collator = DataCollatorForLanguageModeling(
         tokenizer=tokenizer,
-        mlm_probability=0.15,
+        mlm_probability=0.15,  # to be fair across models with different mlm_probabilities
         pad_to_multiple_of=8 if pad_to_multiple_of_8 else None,
     )
 
@@ -517,6 +517,6 @@ def _mp_fn(index):
 if __name__ == "__main__":
     """
     Run with 
-    export PYTHONPATH=. && python src/pretraining/train_mlm.py | tee train_mlm.log
+    export PYTHONPATH=. && python3 src/pretraining/train_mlm.py | tee train_mlm.log
     """
     main()
