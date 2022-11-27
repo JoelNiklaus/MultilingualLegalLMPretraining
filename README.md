@@ -31,6 +31,22 @@ For TPU acceleration use the following script:
 sh train_mlm_tpu.sh
 ```
 
+Create a TPU VM instance with the following script:
+```shell
+gcloud compute tpus tpu-vm create tpu1 --zone=europe-west4-a --accelerator-type=v3-8 --version=tpu-vm-pt-1.12
+```
+
+Connect to the instance:
+```shell
+gcloud compute tpus tpu-vm ssh tpu1 --zone europe-west4-a
+```
+
+Set up the environment:
+```shell
+sudo bash setup_tpu_machine.sh
+```
+
+
 For GPU acceleration use the following script:
 
 ```shell

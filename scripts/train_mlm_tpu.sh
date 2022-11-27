@@ -1,3 +1,5 @@
+# run with sudo bash train_mlm_tpu.sh
+
 export WANDB_PROJECT="multilinguallegalpretraining"
 export XRT_TPU_CONFIG="localservice;0;localhost:51011"
 export AUTH_TOKEN='<put your wandb token here>'
