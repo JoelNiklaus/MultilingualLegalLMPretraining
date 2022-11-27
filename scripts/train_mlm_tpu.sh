@@ -1,12 +1,18 @@
-export WANDB_PROJECT="legal-xlm"
+export WANDB_PROJECT="multilinguallegalpretraining"
 export XRT_TPU_CONFIG="localservice;0;localhost:51011"
-export AUTH_TOKEN='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'
+export AUTH_TOKEN='<put your wandb token here>'
 export PYTHONPATH=.
 
 MODEL_MAX_LENGTH=512
 MODEL_PATH='plms/legal-xlmr-base'
-BATCH_SIZE=32
-ACCUMULATION_STEPS=2
+#BATCH_SIZE=16 # maximum for large size models
+BATCH_SIZE=32 # maximum for base size models
+#ACCUMULATION_STEPS=4 # for large size models
+ACCUMULATION_STEPS=2 # for base size models
+# 8 TPU cores on v3-8 x batch size x accumulation steps = 512
+
+# 1M steps will take approx. 10 days
+# larger mlm probability because of https://arxiv.org/abs/2202.08005
 
 python3 src/pretraining/xla_spawn.py --num_cores=8 src/pretraining/train_mlm.py \
     --model_name_or_path data/${MODEL_PATH} \
@@ -30,10 +36,11 @@ python3 src/pretraining/xla_spawn.py --num_cores=8 src/pretraining/train_mlm.py 
     --warmup_ratio 0.05 \
     --weight_decay 0.01 \
     --mlm_probability 0.20 \
+    --freeze_model_encoder \
     --max_seq_length ${MODEL_MAX_LENGTH} \
     --pad_to_max_length \
     --line_by_line \
-    --hub_model_id=lexlms/roberta-large-cased \
+    --hub_model_id=joelito/legal-xlmr-base \
     --hub_strategy=checkpoint \
     --push_to_hub \
     --hub_private_repo \
