@@ -1,14 +1,8 @@
-# tensorflow can mess up the connection with the TPU
+# tensorflow can mess up the connection with the TPU (in some cases)
 sudo pip uninstall tensorflow
 
 # install jax-smi to show the TPU usage
-sudo pip install jax-smi
-
-# clone the repo
-git clone https://github.com/JoelNiklaus/MultilingualLegalLMPretraining
-
-# Go into the repo
-cd MultilingualLegalLMPretraining
+#sudo pip install jax-smi # this somehow did not work
 
 # install the requirements
 sudo pip install -r requirements.txt

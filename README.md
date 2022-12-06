@@ -43,6 +43,8 @@ gcloud compute tpus tpu-vm ssh tpu1 --zone europe-west4-a
 
 Set up the environment:
 ```shell
+git clone https://github.com/JoelNiklaus/MultilingualLegalLMPretraining
+cd MultilingualLegalLMPretraining
 sudo bash setup_tpu_machine.sh
 ```
 
