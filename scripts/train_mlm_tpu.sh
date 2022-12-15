@@ -16,7 +16,7 @@ ACCUMULATION_STEPS=2 # for base size models
 # 1M steps will take approx. 10 days
 # larger mlm probability because of https://arxiv.org/abs/2202.08005
 
-python3 src/pretraining/xla_spawn.py --num_cores=8 src/pretraining/train_mlm.py \
+sudo python3 src/pretraining/xla_spawn.py --num_cores=8 src/pretraining/train_mlm.py \
     --model_name_or_path data/${MODEL_PATH} \
     --do_train \
     --do_eval \

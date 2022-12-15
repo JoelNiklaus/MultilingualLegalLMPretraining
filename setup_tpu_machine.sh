@@ -1,5 +1,5 @@
 # tensorflow can mess up the connection with the TPU (in some cases)
-sudo pip uninstall tensorflow
+sudo pip uninstall tensorflow -y
 
 # install jax-smi to show the TPU usage
 #sudo pip install jax-smi # this somehow did not work

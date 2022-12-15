@@ -20,11 +20,14 @@ Here is the full list of checkpoints on the hub that can be fine-tuned by this s
 https://huggingface.co/models?filter=fill-mask
 """
 # You can also adapt this script on your own masked language modeling task. Pointers for this are left as comments.
+import sys
+
+sys.path.append("/home/joelniklaus/MultilingualLegalLMPretraining")
+
 import logging
 import math
 import os
 import random
-import sys
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -237,7 +240,7 @@ def main():
 
     # Streaming dataset
     raw_datasets = {'train': [], 'test': []}
-    multilingual_legal_dataset = preprocess_dataset(dataset_name=training_args.dataset_name)
+    multilingual_legal_dataset = preprocess_dataset(dataset_name=data_args.dataset_name)
     raw_datasets['train'] = multilingual_legal_dataset['train']
     raw_datasets['test'] = multilingual_legal_dataset['test']
 
