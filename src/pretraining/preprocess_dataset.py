@@ -1,3 +1,5 @@
+import logging
+
 from datasets import load_dataset, interleave_datasets, Dataset
 
 _LANGUAGES = ['bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga',
@@ -24,8 +26,8 @@ def preprocess_dataset(dataset_name='joelito/Multi_Legal_Pile', languages=None, 
 
                 print(f'Found data for `{DOMAIN_TYPE}` in language `{LANG}`.')
                 # print("Example: ", list(dataset.take(1)))
-            except:
-                print(f'There is no data for `{DOMAIN_TYPE}` in language `{LANG}`.')
+            except Exception:
+                logging.exception(f'There is no data for `{DOMAIN_TYPE}` in language `{LANG}`.')
                 continue
             if DOMAIN_TYPE in ['caselaw', 'legislation']:
                 sampling_scores.append(0.45)  # caselaw and legislation are more important
