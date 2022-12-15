@@ -12,13 +12,13 @@ curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.s
 sudo apt-get install git-lfs
 
 # config git
-git config --global credential.helper store
+sudo git config --global credential.helper store
 
 # login to huggingface
-huggingface-cli login
+sudo huggingface-cli login
 
 # login to wandb
-wandb login
+sudo wandb login
 
 
 
