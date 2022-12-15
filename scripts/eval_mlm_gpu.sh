@@ -5,7 +5,7 @@ MODEL_MAX_LENGTH=512
 MODEL_PATH='lexlms/legal-xlm-base'
 BATCH_SIZE=32
 
-python src/pretraining/eval_mlm.py \
+python3 src/pretraining/eval_mlm.py \
     --model_name_or_path ${MODEL_PATH} \
     --do_eval \
     --dataset_name lexlms/Multi_Legal_Pile \

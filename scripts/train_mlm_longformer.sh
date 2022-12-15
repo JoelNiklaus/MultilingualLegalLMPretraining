@@ -7,7 +7,7 @@ MODEL_PATH='plms/legal-xlm-longformer-base'
 BATCH_SIZE=4
 ACCUMULATION_STEPS=2
 
-python src/pretraining/train_mlm.py \
+python3 src/pretraining/train_mlm.py \
     --model_name_or_path data/${MODEL_PATH} \
     --do_train \
     --do_eval \
