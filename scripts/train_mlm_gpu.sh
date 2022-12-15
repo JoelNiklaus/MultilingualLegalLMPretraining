@@ -10,7 +10,7 @@ python3 src/pretraining/train_mlm.py \
     --model_name_or_path data/${MODEL_PATH} \
     --do_train \
     --do_eval \
-    --dataset_name lexlms/Multi_Legal_Pile \
+    --dataset_name joelito/MultiLegalPile_Chunks_500 \
     --output_dir data/${MODEL_PATH}-mlm \
     --overwrite_output_dir \
     --logging_steps 1000 \
