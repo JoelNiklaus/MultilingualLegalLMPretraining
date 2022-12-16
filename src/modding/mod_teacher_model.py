@@ -24,7 +24,7 @@ def warm_start_model():
     parser.add_argument('--use_flota', default=True)
     parser.add_argument('--flota_mode', default='longest', choices=['flota', 'longest', 'first'])
     parser.add_argument('--auth_token', default=AUTH_KEY)
-    parser.add_argument('--output_dir', default=os.path.join(DATA_DIR, 'plms', 'legal-xlmr-base')) # for warm started models
+    parser.add_argument('--output_dir', default=os.path.join(DATA_DIR, 'plms', 'legal-xlm-base')) # for warm started models
     config = parser.parse_args()
 
     # load tokenizers
