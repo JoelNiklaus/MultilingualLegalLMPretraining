@@ -22,6 +22,7 @@ sudo python3 src/pretraining/xla_spawn.py --num_cores=8 src/pretraining/train_ml
     --do_eval \
     --dataset_name joelito/MultiLegalPile_Chunks_500 \
     --output_dir data/${MODEL_PATH}-mlm \
+    --overwrite_output_dir \
     --logging_steps 1000 \
     --evaluation_strategy steps \
     --eval_steps 50000 \

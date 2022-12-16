@@ -13,7 +13,6 @@
 |:-----------------------------------|-----:|---------:|-------------------:|
 | `xlm-roberta-base`                 |    - |        - |                :x: |
 | `lexlms/legal-xlm-base`            |    - |        - | :white_check_mark: |
-| `lexlms/legal-xlmr-base`           |    - |        - | :white_check_mark: |
 | `lexlms/legal-xlm-longformer-base` |    - |        - | :white_check_mark: |
 
 TODO: Present per language scores
@@ -42,9 +41,7 @@ cd MultilingualLegalLMPretraining
 sudo bash setup_tpu_machine.sh
 ```
 
-Put your huggingface token in `data/__init__.py`.
-
-Put your wandb token in `scripts/train_mlm_tpu.sh`.
+Put your huggingface token in `data/__init__.py` and in `scripts/train_mlm_tpu.sh`.
 
 For TPU acceleration use the following script:
 
