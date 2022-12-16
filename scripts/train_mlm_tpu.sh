@@ -6,7 +6,7 @@ export AUTH_TOKEN='<put your wandb token here>'
 export PYTHONPATH=.
 
 MODEL_MAX_LENGTH=512
-MODEL_PATH='plms/legal-xlmr-base'
+MODEL_PATH='plms/legal-xlm-base'
 #BATCH_SIZE=16 # maximum for large size models
 BATCH_SIZE=32 # maximum for base size models
 #ACCUMULATION_STEPS=4 # for large size models
@@ -42,7 +42,7 @@ sudo python3 src/pretraining/xla_spawn.py --num_cores=8 src/pretraining/train_ml
     --max_seq_length ${MODEL_MAX_LENGTH} \
     --pad_to_max_length \
     --line_by_line \
-    --hub_model_id=joelito/legal-xlmr-base \
+    --hub_model_id=joelito/legal-xlm-base \
     --hub_strategy=checkpoint \
     --push_to_hub \
     --hub_private_repo \
