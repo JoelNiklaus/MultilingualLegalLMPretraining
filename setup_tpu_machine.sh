@@ -14,13 +14,17 @@ sudo apt-get install git-lfs
 # config git
 sudo git config --global credential.helper store
 
+# prevent strange error: fatal: detected dubious ownership in repository at '/home/joelniklaus/MultilingualLegalLMPretraining'
+sudo git config --global --add safe.directory /home/joelniklaus/MultilingualLegalLMPretraining
+
 # login to huggingface
 sudo huggingface-cli login
 
 # login to wandb
 sudo wandb login
 
-
+# set .bashrc
+echo 'cd MultilingualLegalLMPretraining/' >> .bashrc
 
 
 

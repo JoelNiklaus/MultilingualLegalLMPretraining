@@ -43,6 +43,8 @@ sudo bash setup_tpu_machine.sh
 
 Put your huggingface token in `data/__init__.py` and in `scripts/train_mlm_tpu.sh`.
 
+Make sure that you delete the output_dir locally and the huggingface model repo (hub_model_id) before training.
+
 For TPU acceleration use the following script:
 
 ```shell
@@ -89,3 +91,5 @@ python src/longformerize_model.py --roberta_model_path data/plms/legal-xlm-base 
 ## Troubleshooting
 
 If you get a PermissionError: [Errno 13] Permission denied: set the permissions to 777.
+
+If you get strange git lfs errors, delete the huggingface model repo and the output directory

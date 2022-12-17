@@ -1,8 +1,8 @@
 # run with sudo bash train_mlm_tpu.sh
 
+export AUTH_TOKEN='<put_your_huggingface_token_here>'
 export WANDB_PROJECT="multilinguallegalpretraining"
 export XRT_TPU_CONFIG="localservice;0;localhost:51011"
-export AUTH_TOKEN='<put your wandb token here>'
 export PYTHONPATH=.
 
 MODEL_MAX_LENGTH=512
@@ -22,7 +22,6 @@ sudo python3 src/pretraining/xla_spawn.py --num_cores=8 src/pretraining/train_ml
     --do_eval \
     --dataset_name joelito/MultiLegalPile_Chunks_500 \
     --output_dir data/${MODEL_PATH}-mlm \
-    --overwrite_output_dir \
     --logging_steps 1000 \
     --evaluation_strategy steps \
     --eval_steps 50000 \
