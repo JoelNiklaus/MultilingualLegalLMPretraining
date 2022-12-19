@@ -356,7 +356,7 @@ def main():
                 tokenized_datasets[subset] = raw_datasets[subset].map(
                     tokenize_function,
                     batched=True,
-                    remove_columns=["text"],
+                    remove_columns=raw_datasets[subset].column_names,
                 )
     else:
         logger.info(f"Sub-sampling documents subsequences up to {max_seq_length} on the fly!!!")
@@ -396,7 +396,7 @@ def main():
                 tokenized_datasets[subset] = raw_datasets[subset].map(
                     tokenize_function,
                     batched=True,
-                    remove_columns=["text", "language", "type", "jurisdiction"],
+                    remove_columns=raw_datasets[subset].column_names,
                 )
 
     if training_args.do_train:

@@ -259,7 +259,7 @@ def main():
                 tokenized_datasets[subset] = raw_datasets[subset].map(
                     tokenize_function,
                     batched=True,
-                    remove_columns=["text", "language", "type", "jurisdiction"],
+                    remove_columns=raw_datasets[subset].column_names,
                 )
     else:
         raise Exception("Not supported!")
