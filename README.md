@@ -80,13 +80,41 @@ python src/longformerize_model.py --roberta_model_path data/plms/legal-xlm-base 
 ## Pipeline
 
 1. Train tokenizer (Only RoBERTa needed because we convert BERT models to RoBERTa)
+```shell
+    export PYTHONPATH=. && python src/pretraining/train_tokenizer.py | tee train_tokenizer.log
+```
 2. Evaluate tokenizer
+```shell
+    export PYTHONPATH=. && python src/pretraining/evaluate_tokenizer.py | tee evaluate_tokenizer.log
+```
 3. Mod Teacher Model
+```shell
+    export PYTHONPATH=. && python3 src/modding/mod_teacher_model.py | tee mod_teacher_model.log
+```
 4. Train MLM (monolingual: 500K steps) (TPUs or GPUs)
+```shell
+    sudo bash scripts/train_mlm_tpu.sh | tee train_mlm_tpu.log
+```
+or 
+```shell
+    bash scripts/train_mlm_gpu.sh | tee train_mlm_gpu.log
+```
 5. Evaluate MLM
+```shell
+    bash scripts/eval_mlm_gpu.sh | tee eval_mlm_gpu.log
+```
 6. Longformerize MLM
+```shell
+    export PYTHONPATH=. && python src/modding/longformerize_model.py | tee longformerize_model.log
+```
 7. Train Longformer MLM (monolingual: 50K steps) (only GPUs!)
+```shell
+    bash scripts/train_mlm_longformer.sh | tee train_mlm_longformer.log
+```
 8. Evaluate Longformer MLM
+```shell
+    bash scripts/eval_mlm_gpu.sh | tee eval_mlm_gpu.log
+```
 
 ## Troubleshooting
 
