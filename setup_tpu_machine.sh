@@ -24,7 +24,7 @@ sudo huggingface-cli login
 sudo wandb login
 
 # set .bashrc
-echo 'cd MultilingualLegalLMPretraining/' >> .bashrc
+echo 'cd MultilingualLegalLMPretraining/' >> ../.bashrc
 
 
 
