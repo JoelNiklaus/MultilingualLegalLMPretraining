@@ -1,11 +1,11 @@
+MODEL_PATH='data/plms/legal-xlm-base'
+
 python3 src/pretraining/run_mlm_flax.py \
-    --output_dir="./norwegian-roberta-base" \
+    --model_name_or_path="${MODEL_PATH}" \
+    --output_dir="${MODEL_PATH}-mlm" \
     --model_type="roberta" \
-    --config_name="./norwegian-roberta-base" \
-    --tokenizer_name="./norwegian-roberta-base" \
-    --dataset_name="oscar" \
-    --dataset_config_name="unshuffled_deduplicated_no" \
-    --max_seq_length="128" \
+    --dataset_name="joelito/MultiLegalPile_Chunks_500" \
+    --max_seq_length="512" \
     --weight_decay="0.01" \
     --per_device_train_batch_size="128" \
     --per_device_eval_batch_size="128" \
@@ -18,4 +18,6 @@ python3 src/pretraining/run_mlm_flax.py \
     --logging_steps="500" \
     --save_steps="2500" \
     --eval_steps="2500" \
-    --push_to_hub
+    --push_to_hub \
+    --hub_model_id=joelito/legal-xlm-base \
+
