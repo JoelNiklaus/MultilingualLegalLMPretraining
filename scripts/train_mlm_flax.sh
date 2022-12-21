@@ -5,7 +5,7 @@ python3 src/pretraining/run_mlm_flax.py \
     --output_dir="${MODEL_PATH}-mlm" \
     --model_type="roberta" \
     --dataset_name="joelito/MultiLegalPile_Wikipedia_Filtered" \
-    --dataset_config_name="de_all" \
+    --dataset_config_name="de_contracts" \
     --max_seq_length="512" \
     --weight_decay="0.01" \
     --per_device_train_batch_size="128" \
