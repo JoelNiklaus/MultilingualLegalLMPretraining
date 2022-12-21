@@ -1,4 +1,4 @@
-python run_mlm_flax.py \
+python3 src/pretraining/run_mlm_flax.py \
     --output_dir="./norwegian-roberta-base" \
     --model_type="roberta" \
     --config_name="./norwegian-roberta-base" \
