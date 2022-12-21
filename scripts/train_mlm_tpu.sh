@@ -3,8 +3,11 @@
 export AUTH_TOKEN='<put_your_huggingface_token_here>'
 export WANDB_PROJECT="multilinguallegalpretraining"
 export XRT_TPU_CONFIG="localservice;0;localhost:51011"
+export XLA_USE_BF16=1
+unset LD_PRELOAD
 export PYTHONPATH=.
 
+TPU_CORES=8
 MODEL_MAX_LENGTH=512
 MODEL_PATH='plms/legal-xlm-base'
 #BATCH_SIZE=16 # maximum for large size models
@@ -16,7 +19,7 @@ ACCUMULATION_STEPS=2 # for base size models
 # 1M steps will take approx. 10 days
 # larger mlm probability because of https://arxiv.org/abs/2202.08005
 
-sudo python3 src/pretraining/xla_spawn.py --num_cores=8 src/pretraining/train_mlm.py \
+sudo python3 src/pretraining/xla_spawn.py --num_cores=${TPU_CORES} src/pretraining/train_mlm.py \
     --model_name_or_path data/${MODEL_PATH} \
     --do_train \
     --do_eval \
