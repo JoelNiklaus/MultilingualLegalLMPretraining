@@ -8,8 +8,8 @@ python3 src/pretraining/run_mlm_flax.py \
     --dataset_config_name="de_contracts" \
     --max_seq_length="512" \
     --weight_decay="0.01" \
-    --per_device_train_batch_size="128" \
-    --per_device_eval_batch_size="128" \
+    --per_device_train_batch_size="32" \
+    --per_device_eval_batch_size="32" \
     --learning_rate="3e-4" \
     --warmup_steps="1000" \
     --overwrite_output_dir \
