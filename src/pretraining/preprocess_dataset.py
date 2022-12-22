@@ -2,12 +2,13 @@ import logging
 
 from datasets import load_dataset, interleave_datasets, Dataset
 
-_LANGUAGES = ['bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga',
-              'hr', 'hu', 'it', 'lt', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv']
+_LANGUAGES = ['bg', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fi', 'fr', 'ga', 'hr',
+              'hu', 'it', 'lt', 'lv', 'mt', 'nl', 'pl', 'pt', 'ro', 'sk', 'sl', 'sv']
 _DOMAIN_TYPES = ['legislation', 'caselaw', 'contracts', 'other']
 
 
-def preprocess_dataset(dataset_name='joelito/Multi_Legal_Pile', languages=None, domain_types=None, use_interleave_datasets=True, return_test_subsets=False):
+def preprocess_dataset(dataset_name='joelito/Multi_Legal_Pile', languages=None, domain_types=None,
+                       use_interleave_datasets=True, return_test_subsets=False):
     # combine datasets into a large interleaved dataset
     datasets = []
     sampling_scores = []
@@ -21,8 +22,8 @@ def preprocess_dataset(dataset_name='joelito/Multi_Legal_Pile', languages=None, 
             try:
                 dataset = load_dataset(dataset_name, f'{LANG}_{DOMAIN_TYPE}',
                                        split='train', streaming=True, use_auth_token=True)
-                if use_interleave_datasets:
-                    dataset = dataset.filter(lambda example: example['text'] and len(example['text']) > 0)
+                # if use_interleave_datasets:
+                #    dataset = dataset.filter(lambda example: example['text'] and len(example['text']) > 0)
 
                 print(f'Found data for `{DOMAIN_TYPE}` in language `{LANG}`.')
                 # print("Example: ", list(dataset.take(1)))

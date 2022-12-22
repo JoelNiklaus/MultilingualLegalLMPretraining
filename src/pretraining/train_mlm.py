@@ -128,12 +128,17 @@ class DataTrainingArguments:
     """
     Arguments pertaining to what data we are going to input our model for training and eval.
     """
-
     dataset_name: Optional[str] = field(
         default=None, metadata={"help": "The name of the dataset to use (via the datasets library)."}
     )
     dataset_config_name: Optional[str] = field(
         default=None, metadata={"help": "The configuration name of the dataset to use (via the datasets library)."}
+    )
+    languages: Optional[str] = field(
+        default=None, metadata={"help": "The languages to train on. If not specified, all languages are used."}
+    )
+    domain_types: Optional[str] = field(
+        default=None, metadata={"help": "The domain types to train on. If not specified, all domain types are used."}
     )
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
@@ -198,6 +203,11 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
 
+    if data_args.languages is not None:
+        data_args.languages = data_args.languages.split(",")
+    if data_args.domain_types is not None:
+        data_args.domain_types = data_args.domain_types.split(",")
+
     # Setup logging
     logging.basicConfig(
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
@@ -240,7 +250,9 @@ def main():
 
     # Streaming dataset
     raw_datasets = {'train': [], 'test': []}
-    multilingual_legal_dataset = preprocess_dataset(dataset_name=data_args.dataset_name)
+    multilingual_legal_dataset = preprocess_dataset(dataset_name=data_args.dataset_name,
+                                                    languages=data_args.languages,
+                                                    domain_types=data_args.domain_types)
     raw_datasets['train'] = multilingual_legal_dataset['train']
     raw_datasets['test'] = multilingual_legal_dataset['test']
 

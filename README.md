@@ -89,19 +89,19 @@ python src/longformerize_model.py --roberta_model_path data/plms/legal-xlm-base 
 ```
 3. Mod Teacher Model
 ```shell
-    export PYTHONPATH=. && python3 src/modding/mod_teacher_model.py | tee mod_teacher_model.log
+    export PYTHONPATH=. && python3 src/modding/mod_teacher_model.py --teacher_model_path xlm-roberta-base --student_model_path legal-xlm-base_128k --output_dir data/plms/legal-xlm-base | tee mod_teacher_model.log
 ```
 4. Train MLM (monolingual: 500K steps) (TPUs or GPUs)
 ```shell
-    sudo bash scripts/train_mlm_tpu.sh | tee train_mlm_tpu.log
+    sudo sh scripts/train_mlm_tpu.sh | tee train_mlm_tpu.log
 ```
 or 
 ```shell
-    bash scripts/train_mlm_gpu.sh | tee train_mlm_gpu.log
+    sh scripts/train_mlm_gpu.sh | tee train_mlm_gpu.log
 ```
 5. Evaluate MLM
 ```shell
-    bash scripts/eval_mlm_gpu.sh | tee eval_mlm_gpu.log
+    sh scripts/eval_mlm_gpu.sh | tee eval_mlm_gpu.log
 ```
 6. Longformerize MLM
 ```shell
@@ -109,11 +109,11 @@ or
 ```
 7. Train Longformer MLM (monolingual: 50K steps) (only GPUs!)
 ```shell
-    bash scripts/train_mlm_longformer.sh | tee train_mlm_longformer.log
+    sh scripts/train_mlm_longformer.sh | tee train_mlm_longformer.log
 ```
 8. Evaluate Longformer MLM
 ```shell
-    bash scripts/eval_mlm_gpu.sh | tee eval_mlm_gpu.log
+    sh scripts/eval_mlm_gpu.sh | tee eval_mlm_gpu.log
 ```
 
 ## Troubleshooting
