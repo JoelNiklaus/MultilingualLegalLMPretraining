@@ -286,12 +286,7 @@ def main():
             "You can do it from another script, save it, and load it from here, using --tokenizer_name."
         )
 
-    try:
-        url_code = urllib.request.urlopen('https://huggingface.co/' + model_args.model_name_or_path).getcode()
-    except:
-        url_code = 404
-
-    if os.path.exists(os.path.join(model_args.model_name_or_path, "pytorch_model.bin")) or url_code == 200:
+    if os.path.exists(os.path.join(model_args.model_name_or_path, "pytorch_model.bin")):
         logger.info("Continued training from LM checkpoint!")
         model = AutoModelForMaskedLM.from_pretrained(
             model_args.model_name_or_path,
@@ -338,7 +333,7 @@ def main():
         def tokenize_function(examples):
             # Remove empty lines
             examples[text_column_name] = [
-                normalize_text(line) for line in examples[text_column_name] if len(line) > 64 and not line.isspace()
+                line for line in examples[text_column_name] if len(line) > 64 and not line.isspace()
             ]
             return tokenizer(
                 examples[text_column_name],
