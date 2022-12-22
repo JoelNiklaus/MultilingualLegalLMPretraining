@@ -89,7 +89,8 @@ if __name__ == "__main__":
     """
     vocab_sizes = [32000, 64000, 128000]
     languages = [['bg'], ['cs'], ['da'], ['de'], ['el'], ['en'], ['es'], ['et'], ['fi'], ['fr'], ['ga'], ['hr'],
-                 ['hu'], ['it'], ['lt'], ['lv'], ['mt'], ['nl'], ['pl'], ['pt'], ['ro'], ['sk'], ['sl'], ['sv'], None]
+                 ['hu'], ['it'], ['lt'], ['lv'], ['mt'], ['nl'], ['pl'], ['pt'], ['ro'], ['sk'], ['sl'], ['sv'],
+                 ['de', 'fr', 'it'], None]
     for language in languages:
         for vocab_size in vocab_sizes:
             train_tokenizer(vocab_size=vocab_size, languages=language)
