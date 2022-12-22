@@ -3,28 +3,31 @@
 export AUTH_TOKEN='<put_your_huggingface_token_here>'
 export WANDB_PROJECT="multilinguallegalpretraining"
 export XRT_TPU_CONFIG="localservice;0;localhost:51011"
-export XLA_USE_BF16=1
-unset LD_PRELOAD
 export PYTHONPATH=.
 
-TPU_CORES=8
 MODEL_MAX_LENGTH=512
-MODEL_PATH='plms/legal-xlm-base'
-#BATCH_SIZE=16 # maximum for large size models
-BATCH_SIZE=32 # maximum for base size models
-#ACCUMULATION_STEPS=4 # for large size models
-ACCUMULATION_STEPS=2 # for base size models
+MODEL_NAME='legal-xlm-base'
+MODEL_PATH='data/plms/${MODEL_NAME}'
+LANGUAGES='de'
+
+HF_NAME='joelito'
+
+# base
+BATCH_SIZE=16
+ACCUMULATION_STEPS=4
+TPU_CORES=8
 # 8 TPU cores on v3-8 x batch size x accumulation steps = 512
 
 # 1M steps will take approx. 10 days
 # larger mlm probability because of https://arxiv.org/abs/2202.08005
 
 sudo python3 src/pretraining/xla_spawn.py --num_cores=${TPU_CORES} src/pretraining/train_mlm.py \
-    --model_name_or_path data/${MODEL_PATH} \
+    --model_name_or_path ${MODEL_PATH} \
     --do_train \
     --do_eval \
+    --output_dir ${MODEL_PATH}-mlm \
     --dataset_name joelito/MultiLegalPile_Chunks_500 \
-    --output_dir data/${MODEL_PATH}-mlm \
+    --languages ${LANGUAGES} \
     --logging_steps 1000 \
     --evaluation_strategy steps \
     --eval_steps 50000 \
@@ -45,7 +48,7 @@ sudo python3 src/pretraining/xla_spawn.py --num_cores=${TPU_CORES} src/pretraini
     --max_seq_length ${MODEL_MAX_LENGTH} \
     --pad_to_max_length \
     --line_by_line \
-    --hub_model_id=joelito/legal-xlm-base \
+    --hub_model_id=${HF_NAME}/${MODEL_NAME} \
     --hub_strategy=checkpoint \
     --push_to_hub \
     --hub_private_repo \
