@@ -13,7 +13,7 @@ HF_NAME=joelito
 TOTAL_BATCH_SIZE=512
 NUM_GPUS=2
 BATCH_SIZE=16
-ACCUMULATION_STEPS=expr ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${NUM_GPUS}
+ACCUMULATION_STEPS=$(expr ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${NUM_GPUS})
 
 python3 src/pretraining/train_mlm.py \
     --model_name_or_path data/${MODEL_PATH} \
