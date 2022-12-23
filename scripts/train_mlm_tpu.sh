@@ -13,10 +13,10 @@ LANGUAGES=de
 HF_NAME=joelito
 
 # base
-BATCH_SIZE=16
-ACCUMULATION_STEPS=4
-TPU_CORES=8
 # 8 TPU cores on v3-8 x batch size x accumulation steps = 512
+BATCH_SIZE=16
+TPU_CORES=8
+ACCUMULATION_STEPS=expr ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${NUM_GPUS}
 
 # 1M steps will take approx. 10 days
 # larger mlm probability because of https://arxiv.org/abs/2202.08005
