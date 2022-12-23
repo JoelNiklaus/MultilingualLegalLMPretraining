@@ -140,6 +140,9 @@ class DataTrainingArguments:
     domain_types: Optional[str] = field(
         default=None, metadata={"help": "The domain types to train on. If not specified, all domain types are used."}
     )
+    streaming: bool = field(
+        default=True, metadata={"help": "Whether to stream the dataset or not."}
+    )
     overwrite_cache: bool = field(
         default=False, metadata={"help": "Overwrite the cached training and evaluation sets"}
     )
@@ -252,7 +255,8 @@ def main():
     raw_datasets = {'train': [], 'test': []}
     multilingual_legal_dataset = preprocess_dataset(dataset_name=data_args.dataset_name,
                                                     languages=data_args.languages,
-                                                    domain_types=data_args.domain_types)
+                                                    domain_types=data_args.domain_types,
+                                                    streaming=data_args.streaming)
     raw_datasets['train'] = multilingual_legal_dataset['train']
     raw_datasets['test'] = multilingual_legal_dataset['test']
 
@@ -414,7 +418,10 @@ def main():
         train_dataset = tokenized_datasets["train"]
         if data_args.max_train_samples is not None:
             max_train_samples = data_args.max_train_samples
-            train_dataset = train_dataset.take(max_train_samples)
+            if data_args.streaming:
+                train_dataset = train_dataset.take(max_train_samples)
+            else:
+                train_dataset = train_dataset.select(range(max_train_samples))
 
     if training_args.do_eval:
         if "test" not in tokenized_datasets:
@@ -422,7 +429,10 @@ def main():
         eval_dataset = tokenized_datasets["test"]
         if data_args.max_eval_samples is not None:
             max_eval_samples = data_args.max_eval_samples
-            eval_dataset = eval_dataset.take(max_eval_samples)
+            if data_args.streaming:
+                eval_dataset = eval_dataset.take(max_eval_samples)
+            else:
+                eval_dataset = eval_dataset.select(range(max_eval_samples))
 
         def preprocess_logits_for_metrics(logits, labels):
             if isinstance(logits, tuple):
