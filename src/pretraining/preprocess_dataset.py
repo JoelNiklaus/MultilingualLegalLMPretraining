@@ -8,7 +8,7 @@ _DOMAIN_TYPES = ['legislation', 'caselaw', 'contracts', 'other']
 
 
 def preprocess_dataset(dataset_name='joelito/Multi_Legal_Pile', languages=None, domain_types=None,
-                       use_interleave_datasets=True, return_test_subsets=False):
+                       use_interleave_datasets=True, return_test_subsets=False, streaming=True):
     # combine datasets into a large interleaved dataset
     datasets = []
     sampling_scores = []
@@ -21,7 +21,7 @@ def preprocess_dataset(dataset_name='joelito/Multi_Legal_Pile', languages=None, 
         for DOMAIN_TYPE in domain_types:
             try:
                 dataset = load_dataset(dataset_name, f'{LANG}_{DOMAIN_TYPE}',
-                                       split='train', streaming=True, use_auth_token=True)
+                                       split='train', streaming=streaming, use_auth_token=True)
                 # if use_interleave_datasets:
                 #    dataset = dataset.filter(lambda example: example['text'] and len(example['text']) > 0)
 
@@ -52,8 +52,12 @@ def preprocess_dataset(dataset_name='joelito/Multi_Legal_Pile', languages=None, 
     print("Splitting into training and evaluation subsets")
     multilingual_legal_dataset_splits = {}
     test_size = 5_000 * len(languages)  # for each language 5_000
-    multilingual_legal_dataset_splits['train'] = multilingual_legal_dataset.skip(test_size)
-    multilingual_legal_dataset_splits['test'] = multilingual_legal_dataset.take(test_size)
+    if streaming:
+        multilingual_legal_dataset_splits['train'] = multilingual_legal_dataset.skip(test_size)
+        multilingual_legal_dataset_splits['test'] = multilingual_legal_dataset.take(test_size)
+    else:
+        multilingual_legal_dataset_splits['train'] = multilingual_legal_dataset.select(range(test_size, len(multilingual_legal_dataset)))
+        multilingual_legal_dataset_splits['test'] = multilingual_legal_dataset.select(range(test_size))
 
     if return_test_subsets:
         # Convert to a normal dataset to prevent wierd issues with references with the iterable datasets

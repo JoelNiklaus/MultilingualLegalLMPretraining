@@ -362,6 +362,7 @@ def main():
             for subset in raw_datasets:
                 tokenized_datasets[subset] = raw_datasets[subset].map(
                     tokenize_function,
+                    num_proc=data_args.preprocessing_num_workers,
                     batched=True,
                     remove_columns=["text", "language", "type", "jurisdiction"],
                 )
@@ -402,6 +403,7 @@ def main():
             for subset in raw_datasets:
                 tokenized_datasets[subset] = raw_datasets[subset].map(
                     tokenize_function,
+                    num_proc=data_args.preprocessing_num_workers,
                     batched=True,
                     remove_columns=["text", "language", "type", "jurisdiction"],
                 )
