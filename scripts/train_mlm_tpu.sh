@@ -53,5 +53,5 @@ sudo python3 src/pretraining/xla_spawn.py --num_cores=${TPU_CORES} src/pretraini
     --push_to_hub \
     --hub_private_repo \
     --hub_token=${AUTH_TOKEN} \
-    --max_eval_samples 10000
+    --max_eval_samples 5000
 
