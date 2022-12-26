@@ -17,7 +17,7 @@ HF_NAME=joelito
 # 2 A100 GPUs x batch size x accumulation steps = 512
 TOTAL_BATCH_SIZE=512
 NUM_GPUS=2
-BATCH_SIZE=16
+BATCH_SIZE=128 # for 80 GB NVIDIA A100 GPU
 ACCUMULATION_STEPS=$(expr ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${NUM_GPUS})
 
 python3 src/pretraining/train_mlm.py \
