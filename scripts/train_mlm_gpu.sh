@@ -1,3 +1,6 @@
+# run with bash train_mlm_gpu.sh
+
+export AUTH_TOKEN='<put_your_huggingface_token_here>'
 export WANDB_PROJECT="multilinguallegalpretraining"
 export PYTHONPATH=.
 
@@ -9,8 +12,6 @@ LANGUAGES=de
 cp -r data/plms/${MODEL_NAME} ${MODEL_PATH}
 
 HF_NAME=joelito
-
-NUM_CPUS=32
 
 # base
 # 2 A100 GPUs x batch size x accumulation steps = 512
@@ -27,7 +28,6 @@ python3 src/pretraining/train_mlm.py \
     --dataset_name joelito/MultiLegalPile_Chunks_500 \
     --languages ${LANGUAGES} \
     --streaming True \
-    --preprocessing_num_workers ${NUM_CPUS} \
     --logging_steps 1000 \
     --evaluation_strategy steps \
     --eval_steps 50000 \
