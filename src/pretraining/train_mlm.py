@@ -310,6 +310,7 @@ def main():
             config=config,
             cache_dir=model_args.cache_dir,
             revision=model_args.model_revision,
+            ignore_mismatched_sizes=True,
             use_auth_token=True if model_args.use_auth_token else None,
         )
     else:
@@ -366,7 +367,6 @@ def main():
             for subset in raw_datasets:
                 tokenized_datasets[subset] = raw_datasets[subset].map(
                     tokenize_function,
-                    num_proc=data_args.preprocessing_num_workers,
                     batched=True,
                     remove_columns=["text", "language", "type", "jurisdiction"],
                 )
@@ -407,7 +407,6 @@ def main():
             for subset in raw_datasets:
                 tokenized_datasets[subset] = raw_datasets[subset].map(
                     tokenize_function,
-                    num_proc=data_args.preprocessing_num_workers,
                     batched=True,
                     remove_columns=["text", "language", "type", "jurisdiction"],
                 )

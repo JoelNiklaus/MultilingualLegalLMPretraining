@@ -2,7 +2,7 @@ import shutil
 
 from tokenizers import models, pre_tokenizers, decoders, processors, trainers, normalizers
 from tokenizers import Tokenizer
-from transformers import PreTrainedTokenizerFast, AutoTokenizer
+from transformers import PreTrainedTokenizerFast, AutoTokenizer, AutoConfig
 import os
 from preprocess_dataset import preprocess_dataset
 from src.pretraining.tokenizer_utils import CUSTOM_TOK_FOLDER, get_vocab_tok_folder, show_examples
@@ -74,11 +74,14 @@ def train_tokenizer(vocab_size=64_000, languages=None, domain_types=None, lowerc
     # save and load tokenizer
     vocab_tok_folder = get_vocab_tok_folder(languages, vocab_size)
     new_roberta_tokenizer.save_pretrained(vocab_tok_folder)
-    shutil.copy(os.path.join(CUSTOM_TOK_FOLDER, "config.json"), os.path.join(vocab_tok_folder, "config.json"))
-    tokenizer = AutoTokenizer.from_pretrained(vocab_tok_folder)
+
+    config_path = os.path.join(vocab_tok_folder, "config.json")
+    shutil.copy(os.path.join(CUSTOM_TOK_FOLDER, "config.json"), config_path)
+    AutoConfig.from_pretrained(config_path, vocab_size=vocab_size).save_pretrained(config_path)  # update vocab size
 
     print(f'Trained BPE tokenizer with  a vocabulary of {vocab_size} sub-words successfully!')
 
+    tokenizer = AutoTokenizer.from_pretrained(vocab_tok_folder)
     show_examples(dataset, tokenizer)
 
 
