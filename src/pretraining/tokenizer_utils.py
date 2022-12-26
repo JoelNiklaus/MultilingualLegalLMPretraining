@@ -65,17 +65,17 @@ def get_comparison_tokenizer(languages):
     return comparison_tokenizers[languages[0]] if languages and len(languages) == 1 else 'xlm-roberta-base'
 
 
-def get_vocab_tok_folder(languages, vocab_size):
+def get_vocab_tok_folder(languages, vocab_size, size='base'):
     if languages:
         if len(languages) == 1:
-            lang = f"{isocode2lang[languages[0]]}-bert"
+            lang = isocode2lang[languages[0]]
         elif languages == ['de', 'fr', 'it']:
-            lang = "swiss-bert"
+            lang = "swiss"
         else:
             raise ValueError(f"Unsupported languages: {languages}")
     else:
         lang = "xlm"
-    lang_folder = os.path.join(PLM_FOLDER, f"legal-{lang}-base")
+    lang_folder = os.path.join(PLM_FOLDER, f"legal-{lang}-roberta-{size}")
     return lang_folder + f'_{vocab_size // 1000}k'
 
 

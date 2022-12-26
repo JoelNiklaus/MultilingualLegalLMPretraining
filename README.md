@@ -89,7 +89,7 @@ python src/longformerize_model.py --roberta_model_path data/plms/legal-xlm-base 
 ```
 3. Mod Teacher Model
 ```shell
-    export PYTHONPATH=. && python3 src/modding/mod_teacher_model.py --teacher_model_path xlm-roberta-base --student_model_path data/plms/legal-xlm-base_128k --output_dir data/plms/legal-xlm-base | tee mod_teacher_model.log
+    export PYTHONPATH=. NAME=legal-xlm-roberta-base SIZE=128k  && python3 src/modding/mod_teacher_model.py --teacher_model_path xlm-roberta-base --student_model_path data/plms/${NAME}_${SIZE} --output_dir data/plms/${NAME} | tee mod_teacher_model.log
 ```
 4. Train MLM (monolingual: 500K steps) (TPUs or GPUs)
 ```shell

@@ -2,8 +2,8 @@ export WANDB_PROJECT="multilinguallegalpretraining"
 export PYTHONPATH=.
 
 MODEL_MAX_LENGTH=512
-MODEL_NAME=legal-xlm-base
-MODEL_PATH=data/plms/${MODEL_NAME}
+MODEL_NAME=legal-german-roberta-base
+MODEL_PATH=$SCRATCH/MultilingualLMPretraining/data/plms/${MODEL_NAME}
 LANGUAGES=de
 
 HF_NAME=joelito
@@ -22,6 +22,7 @@ python3 src/pretraining/train_mlm.py \
     --output_dir ${MODEL_PATH}-mlm \
     --dataset_name joelito/MultiLegalPile_Chunks_500 \
     --languages ${LANGUAGES} \
+    --streaming False \
     --logging_steps 1000 \
     --evaluation_strategy steps \
     --eval_steps 50000 \
