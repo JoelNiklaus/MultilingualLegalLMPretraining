@@ -207,10 +207,10 @@ def warm_start_model():
                                     student_teacher_mapping_ids=student_teacher_mapping_ids)
 
     # save frankenstein model
-    student_model.save_pretrained(os.path.join(DATA_DIR, config.output_dir))
+    student_model.save_pretrained(config.output_dir)
 
     # save student tokenizer
-    student_tokenizer.save_pretrained(os.path.join(DATA_DIR, config.output_dir))
+    student_tokenizer.save_pretrained(config.output_dir)
 
 if __name__ == '__main__':
     """

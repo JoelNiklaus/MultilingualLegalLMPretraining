@@ -6,7 +6,11 @@ MODEL_NAME=legal-german-roberta-base
 MODEL_PATH=$SCRATCH/MultilingualLMPretraining/data/plms/${MODEL_NAME}
 LANGUAGES=de
 
+cp -r data/plms/${MODEL_NAME} ${MODEL_PATH}
+
 HF_NAME=joelito
+
+NUM_CPUS=32
 
 # base
 # 2 A100 GPUs x batch size x accumulation steps = 512
@@ -16,13 +20,14 @@ BATCH_SIZE=16
 ACCUMULATION_STEPS=$(expr ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${NUM_GPUS})
 
 python3 src/pretraining/train_mlm.py \
-    --model_name_or_path data/${MODEL_PATH} \
+    --model_name_or_path ${MODEL_PATH} \
     --do_train \
     --do_eval \
     --output_dir ${MODEL_PATH}-mlm \
     --dataset_name joelito/MultiLegalPile_Chunks_500 \
     --languages ${LANGUAGES} \
-    --streaming False \
+    --streaming True \
+    --preprocessing_num_workers ${NUM_CPUS} \
     --logging_steps 1000 \
     --evaluation_strategy steps \
     --eval_steps 50000 \
