@@ -14,12 +14,13 @@ cp -r data/plms/${MODEL_NAME} ${MODEL_PATH}
 HF_NAME=joelito
 
 # base
-# 2 A100 GPUs x batch size x accumulation steps = 512
-TOTAL_BATCH_SIZE=512
-NUM_GPUS=2
-BATCH_SIZE=128 # for 80 GB NVIDIA A100 GPU
+# 4 A100 GPUs x batch size x accumulation steps = 512
+TOTAL_BATCH_SIZE=1024
+NUM_GPUS=4
+BATCH_SIZE=256 # for 80 GB NVIDIA A100 GPU
 ACCUMULATION_STEPS=$(expr ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${NUM_GPUS})
 
+# one could try to use DDP instead of DP to possibly get a 10% speedup
 python3 src/pretraining/train_mlm.py \
     --model_name_or_path ${MODEL_PATH} \
     --do_train \
