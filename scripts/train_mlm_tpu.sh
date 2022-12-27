@@ -1,15 +1,16 @@
 # run with sudo bash train_mlm_tpu.sh
 
-export AUTH_TOKEN='<put_your_huggingface_token_here>'
-export WANDB_PROJECT="multilinguallegalpretraining"
-export XRT_TPU_CONFIG="localservice;0;localhost:51011"
 export PYTHONPATH=.
+export WANDB_PROJECT="multilinguallegalpretraining"
+export TOKENIZERS_PARALLELISM=true
+export XRT_TPU_CONFIG="localservice;0;localhost:51011"
 
 MODEL_MAX_LENGTH=512
-MODEL_NAME=legal-xlm-roberta-base
+MODEL_NAME=legal-french-roberta-base
 MODEL_PATH=data/plms/${MODEL_NAME}
-LANGUAGES=de
+LANGUAGES=fr
 
+HF_AUTH_TOKEN='<hf_token>'
 HF_NAME=joelito
 
 # base
@@ -53,6 +54,6 @@ sudo python3 src/pretraining/xla_spawn.py --num_cores=${TPU_CORES} src/pretraini
     --hub_strategy=checkpoint \
     --push_to_hub \
     --hub_private_repo \
-    --hub_token=${AUTH_TOKEN} \
+    --hub_token=${HF_AUTH_TOKEN} \
     --max_eval_samples 5000
 

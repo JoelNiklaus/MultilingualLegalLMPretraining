@@ -1,8 +1,7 @@
 # run with bash train_mlm_gpu.sh
 
-export AUTH_TOKEN='<put_your_huggingface_token_here>'
-export WANDB_PROJECT="multilinguallegalpretraining"
 export PYTHONPATH=.
+export WANDB_PROJECT="multilinguallegalpretraining"
 export TOKENIZERS_PARALLELISM=true
 
 MODEL_MAX_LENGTH=512
@@ -12,6 +11,7 @@ LANGUAGES=de
 
 cp -r data/plms/${MODEL_NAME} ${MODEL_PATH}
 
+HF_AUTH_TOKEN='<hf_token>'
 HF_NAME=joelito
 
 # base
@@ -59,7 +59,7 @@ python3 src/pretraining/train_mlm.py \
     --hub_strategy=checkpoint \
     --push_to_hub \
     --hub_private_repo \
-    --hub_token=${AUTH_TOKEN} \
+    --hub_token=${HF_AUTH_TOKEN} \
     --max_eval_samples 5000 \
     --bf16 \
     --bf16_full_eval
