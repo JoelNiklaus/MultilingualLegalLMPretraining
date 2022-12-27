@@ -21,10 +21,10 @@ NUM_GPUS=4
 # somehow I can fit batch size 256 with streaming but only 64 otherwise
 # also, without streaming it is extremely slow (30s/it)
 BATCH_SIZE=256 # for 80 GB NVIDIA A100 GPU
-ACCUMULATION_STEPS=$(expr ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${NUM_GPUS})
+ACCUMULATION_STEPS=$(( ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${NUM_GPUS} ))
 
-EVAL_BATCH_SIZE=$(expr ${BATCH_SIZE} / 2) # we need to reduce it because otherwise the memory somehow fills up
-EVAL_ACCUMULATION_STEPS=$(expr ${ACCUMULATION_STEPS} * 2)
+EVAL_BATCH_SIZE=$(( ${BATCH_SIZE} / 2 )) # we need to reduce it because otherwise the memory somehow fills up
+EVAL_ACCUMULATION_STEPS=$(( ${ACCUMULATION_STEPS} * 2 ))
 
 # one could try to use DDP instead of DP to possibly get a 10% speedup
 python3 src/pretraining/train_mlm.py \
@@ -44,9 +44,9 @@ python3 src/pretraining/train_mlm.py \
     --max_steps 1000000 \
     --learning_rate 1e-4 \
     --per_device_train_batch_size ${BATCH_SIZE} \
-    --per_device_eval_batch_size ${BATCH_SIZE} \
+    --per_device_eval_batch_size ${EVAL_BATCH_SIZE} \
     --gradient_accumulation_steps ${ACCUMULATION_STEPS} \
-    --eval_accumulation_steps ${ACCUMULATION_STEPS} \
+    --eval_accumulation_steps ${EVAL_ACCUMULATION_STEPS} \
     --lr_scheduler_type cosine \
     --warmup_ratio 0.05 \
     --weight_decay 0.01 \

@@ -17,7 +17,7 @@ HF_NAME=joelito
 TOTAL_BATCH_SIZE=512
 BATCH_SIZE=16
 TPU_CORES=8
-ACCUMULATION_STEPS=$(expr ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${TPU_CORES})
+ACCUMULATION_STEPS=$(( ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${TPU_CORES} ))
 
 # 1M steps will take approx. 10 days
 # larger mlm probability because of https://arxiv.org/abs/2202.08005
