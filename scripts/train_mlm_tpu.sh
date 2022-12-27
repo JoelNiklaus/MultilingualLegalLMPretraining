@@ -6,7 +6,7 @@ export XRT_TPU_CONFIG="localservice;0;localhost:51011"
 export PYTHONPATH=.
 
 MODEL_MAX_LENGTH=512
-MODEL_NAME=legal-xlm-base
+MODEL_NAME=legal-xlm-roberta-base
 MODEL_PATH=data/plms/${MODEL_NAME}
 LANGUAGES=de
 
