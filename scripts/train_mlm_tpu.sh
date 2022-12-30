@@ -13,11 +13,18 @@ LANGUAGES=fr
 HF_AUTH_TOKEN='<hf_token>'
 HF_NAME=joelito
 
-# base
 # 8 TPU cores on v3-8 x batch size x accumulation steps = 512
 TOTAL_BATCH_SIZE=512
-BATCH_SIZE=16
 TPU_CORES=8
+# Set BATCH_SIZE to 8 if "large" is present in MODEL_NAME, and to 16 if "base" is present in MODEL_NAME
+if [[ $MODEL_NAME == *"large"* ]]; then
+  BATCH_SIZE=8
+elif [[ $MODEL_NAME == *"base"* ]]; then
+  BATCH_SIZE=16
+else
+  # Set BATCH_SIZE to a default value if neither "large" nor "base" is present in MODEL_NAME
+  BATCH_SIZE=32
+fi
 ACCUMULATION_STEPS=$(( ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${TPU_CORES} ))
 
 # 1M steps will take approx. 10 days
