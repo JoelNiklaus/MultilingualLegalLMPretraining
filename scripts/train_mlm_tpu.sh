@@ -19,11 +19,14 @@ TPU_CORES=8
 # Set BATCH_SIZE to 8 if "large" is present in MODEL_NAME, and to 16 if "base" is present in MODEL_NAME
 if [[ $MODEL_NAME == *"large"* ]]; then
   BATCH_SIZE=8
+  MLM_PROBABILITY=0.30
 elif [[ $MODEL_NAME == *"base"* ]]; then
   BATCH_SIZE=16
+  MLM_PROBABILITY=0.20
 else
-  # Set BATCH_SIZE to a default value if neither "large" nor "base" is present in MODEL_NAME
+  # Set defaults for other models
   BATCH_SIZE=32
+  MLM_PROBABILITY=0.15
 fi
 ACCUMULATION_STEPS=$(( ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${TPU_CORES} ))
 
@@ -52,7 +55,7 @@ sudo python3 src/pretraining/xla_spawn.py --num_cores=${TPU_CORES} src/pretraini
     --lr_scheduler_type cosine \
     --warmup_ratio 0.05 \
     --weight_decay 0.01 \
-    --mlm_probability 0.20 \
+    --mlm_probability ${MLM_PROBABILITY} \
     --freeze_model_encoder \
     --max_seq_length ${MODEL_MAX_LENGTH} \
     --pad_to_max_length \
