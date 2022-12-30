@@ -16,10 +16,10 @@ class FlotaTokenizer:
         if 'bert-' in self.model_path:
             self.special = '##'
             self.max_len = 18
-        elif self.model_path == 'roberta-base':
+        elif 'roberta-' in self.model_path:
             self.special = '\u0120'
             self.max_len = 19
-        elif self.model_path == 'xlm-roberta-base':
+        elif 'xlm-roberta' in self.model_path:
             self.special = '▁'
             self.max_len = 16
 
@@ -65,7 +65,7 @@ class FlotaTokenizer:
                         elif not self.strict and self.special + subword in self.vocab:
                             return self.special + subword, w[:i] + l * '-' + w[i + l:], i
                     else:
-                        if self.special + subword in self. vocab:
+                        if self.special + subword in self.vocab:
                             return self.special + subword, w[:i] + l * '-' + w[i + l:], i
                         elif subword in self.vocab:
                             return subword, w[:i] + l * '-' + w[i + l:], i
