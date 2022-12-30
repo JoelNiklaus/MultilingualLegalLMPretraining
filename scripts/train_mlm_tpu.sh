@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # run with sudo bash train_mlm_tpu.sh
 
 export PYTHONPATH=.

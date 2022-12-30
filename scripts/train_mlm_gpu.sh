@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # run with bash train_mlm_gpu.sh
 
 export PYTHONPATH=.
