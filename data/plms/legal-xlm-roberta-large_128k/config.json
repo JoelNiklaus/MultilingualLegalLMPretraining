@@ -1,5 +1,5 @@
 {
-  "_name_or_path": "data/plms/legal-xlm-roberta-large_32k",
+  "_name_or_path": "data/plms/legal-xlm-roberta-large_128k",
   "architectures": [
     "RobertaForMaskedLM"
   ],
