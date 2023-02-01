@@ -24,14 +24,14 @@ TOTAL_BATCH_SIZE=512
 TPU_CORES=8
 # Set BATCH_SIZE to 8 if "large" is present in MODEL_NAME, and to 16 if "base" is present in MODEL_NAME
 if [[ $MODEL_NAME == *"large"* ]]; then
-  BATCH_SIZE=8
+  BATCH_SIZE=32
   MLM_PROBABILITY=0.30
 elif [[ $MODEL_NAME == *"base"* ]]; then
-  BATCH_SIZE=16
+  BATCH_SIZE=64
   MLM_PROBABILITY=0.20
 else
   # Set defaults for other models
-  BATCH_SIZE=32
+  BATCH_SIZE=128
   MLM_PROBABILITY=0.15
 fi
 ACCUMULATION_STEPS=$(( ${TOTAL_BATCH_SIZE} / ${BATCH_SIZE} / ${TPU_CORES} ))
