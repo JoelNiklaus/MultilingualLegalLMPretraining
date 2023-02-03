@@ -18,6 +18,9 @@ MODEL_NAME=legal-french-roberta-base
 MODEL_PATH=data/plms/${MODEL_NAME}
 LANGUAGES=fr
 
+MAX_STEPS=1000000 # for multilingual models and
+MAX_STEPS=100000 # for short monolingual models so we can have one run for every language
+
 STREAMING=True
 CONTINUE_TRAINING=false
 
@@ -63,7 +66,7 @@ sudo python3 src/pretraining/xla_spawn.py --num_cores=${TPU_CORES} src/pretraini
     --save_strategy steps \
     --save_steps 50000 \
     --save_total_limit 5 \
-    --max_steps 1000000 \
+    --max_steps ${MAX_STEPS} \
     --learning_rate 1e-4 \
     --per_device_train_batch_size ${BATCH_SIZE} \
     --per_device_eval_batch_size ${BATCH_SIZE} \
