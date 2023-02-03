@@ -19,7 +19,7 @@ MODEL_PATH=data/plms/${MODEL_NAME}
 LANGUAGES=fr
 
 MAX_STEPS=1000000 # for multilingual models and
-MAX_STEPS=100000 # for short monolingual models so we can have one run for every language
+MAX_STEPS=200000 # for short monolingual models so we can have one run for every language
 
 STREAMING=True
 CONTINUE_TRAINING=false
