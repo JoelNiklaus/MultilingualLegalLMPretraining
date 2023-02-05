@@ -5,7 +5,6 @@
 export PYTHONPATH=.
 export WANDB_PROJECT="multilinguallegalpretraining"
 export TOKENIZERS_PARALLELISM=true
-# export XRT_TPU_CONFIG="localservice;0;localhost:51011" # probably not necessary on pod
 
 HF_AUTH_TOKEN='<hf_token>'
 HF_NAME=joelito
