@@ -10,13 +10,13 @@ export XRT_TPU_CONFIG="localservice;0;localhost:51011"
 HF_AUTH_TOKEN='<hf_token>'
 HF_NAME=joelito
 
-HUB_MODEL_PATH=${HF_NAME}/${MODEL_NAME}
-
-
 MODEL_MAX_LENGTH=512
 MODEL_NAME=legal-french-roberta-base
 MODEL_PATH=data/plms/${MODEL_NAME}
 LANGUAGES=fr
+
+HUB_MODEL_PATH=${HF_NAME}/${MODEL_NAME}
+
 
 MAX_STEPS=500000 # for multilingual models and models with a large userbase
 MAX_STEPS=200000 # for short monolingual models so we can have one run for every language
