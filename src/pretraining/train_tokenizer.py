@@ -90,7 +90,7 @@ if __name__ == "__main__":
     Run with 
     export PYTHONPATH=. && python src/pretraining/train_tokenizer.py | tee train_tokenizer.log
     """
-    vocab_sizes = [32000, 64000, 128000]
+    vocab_sizes = [32000, 64000, 128000, 256000, 512000]
     languages = [['bg'], ['cs'], ['da'], ['de'], ['el'], ['en'], ['es'], ['et'], ['fi'], ['fr'], ['ga'], ['hr'],
                  ['hu'], ['it'], ['lt'], ['lv'], ['mt'], ['nl'], ['pl'], ['pt'], ['ro'], ['sk'], ['sl'], ['sv'],
                  ['de', 'fr', 'it'], None]

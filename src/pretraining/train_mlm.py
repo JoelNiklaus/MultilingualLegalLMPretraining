@@ -342,6 +342,7 @@ def main():
             )
         max_seq_length = min(data_args.max_seq_length, tokenizer.model_max_length)
 
+    colums_to_remove = ["text", "language", "type", "jurisdiction"]
     if data_args.line_by_line:
         # When using line_by_line, we just tokenize each nonempty line.
         padding = "max_length" if data_args.pad_to_max_length else False
@@ -368,7 +369,7 @@ def main():
                 tokenized_datasets[subset] = raw_datasets[subset].map(
                     tokenize_function,
                     batched=True,
-                    remove_columns=["text", "language", "type", "jurisdiction"],
+                    remove_columns=colums_to_remove,
                 )
     else:
         logger.info(f"Sub-sampling documents subsequences up to {max_seq_length} on the fly!!!")
@@ -408,7 +409,7 @@ def main():
                 tokenized_datasets[subset] = raw_datasets[subset].map(
                     tokenize_function,
                     batched=True,
-                    remove_columns=["text", "language", "type", "jurisdiction"],
+                    remove_columns=colums_to_remove,
                 )
 
     if training_args.do_train:

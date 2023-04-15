@@ -9,11 +9,14 @@ from tokenizers import normalizers
 from data import DATA_DIR
 from src.pretraining.preprocess_dataset import preprocess_dataset
 
-MAX_SEQ_LENGTH = 500
+MAX_SEQ_LENGTH = 4000
 GOAL_SEQUENCES_NUMBER = float('inf')  # set to a lower number to limit the maximum number of examples
 VALIDATION_SIZE = 10_000  # ~10MB per configuration ==> some low-resource configs will only have a validation file
 
-chunk_dir = os.path.join(DATA_DIR, 'mlm_dataset', 'chunks_512')
+chunk_dir = os.path.join(DATA_DIR, 'mlm_dataset', 'chunks_4096')
+
+max_samples_per_file = 5_000_000 # for 512 seq len
+max_samples_per_file = 500_000 # for 4096 seq len
 
 
 def write_samples(dataset_number):
@@ -46,7 +49,7 @@ def write_samples(dataset_number):
                     total_count = 0
                     out_file = open_file(dataset_name, file_number, "train")
                 # on average approx. 10GB per file, compresses (with xz) to around ~2-3GB (xz: ~75% compression ratio)
-                if "train" in out_file.name and temp_count > 5_000_000:
+                if "train" in out_file.name and temp_count > max_samples_per_file:
                     # if we are saving to train, and we reached the max size per file, switch to the next file
                     out_file.close()
                     file_number += 1
@@ -84,10 +87,11 @@ def open_file(dataset_name, file_number, split):
     return open(os.path.join(chunk_dir, f'{dataset_name}_{split}_{file_number}.jsonl'), 'w', encoding='utf8')
 
 
-def split_documents(use_sampling_scores=False):
+def split_documents(use_sampling_scores=False, revision=None):
     ''' set default hyperparams in default_hyperparams.py '''
     # Load all datasets across languages and types
-    datasets, sampling_scores = preprocess_dataset(languages=None, domain_types=None, use_interleave_datasets=False)
+    datasets, sampling_scores = preprocess_dataset(revision=revision, languages=None, domain_types=None,
+                                                   use_interleave_datasets=False)
     # Shuffle datasets to pick and write up to N entries (GOAL_SEQUENCES_NUMBER * sampling_score) that are going to be used.
     datasets = [(dataset.shuffle(seed=42, buffer_size=10_000),
                  int(GOAL_SEQUENCES_NUMBER * sampling_score) if use_sampling_scores else GOAL_SEQUENCES_NUMBER,
@@ -112,4 +116,4 @@ if __name__ == '__main__':
     Run with 
     export PYTHONPATH=. && python src/data_preprocessing/prepare_mlm_dataset.py | tee prepare_mlm_dataset.log
     """
-    split_documents()
+    split_documents(revision="012296c9cd4eb98a5ba366f9a3f5fb026ee816ca")  # make sure we can reproduce the dataset
