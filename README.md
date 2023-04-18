@@ -67,25 +67,25 @@ sh eval_mlm_gpu.sh
 
 ```bash
 export PYTHONPATH=.
-python src/mod_teacher_model.py --teacher_model_path xlm-roberta-base --student_model_path data/plms/legal-xlm-base
+python3 src/mod_teacher_model.py --teacher_model_path xlm-roberta-base --student_model_path data/plms/legal-xlm-base
 ```
 
 ### Longformerize pre-trained RoBERTa LM
 
 ```bash
 export PYTHONPATH=.
-python src/longformerize_model.py --roberta_model_path data/plms/legal-xlm-base --max_length 4096 --attention_window 128
+python3 src/longformerize_model.py --roberta_model_path data/plms/legal-xlm-base --max_length 4096 --attention_window 128
 ```
 
 ## Pipeline
 
 1. Train tokenizer (Only RoBERTa needed because we convert BERT models to RoBERTa)
 ```shell
-    export PYTHONPATH=. && python src/pretraining/train_tokenizer.py | tee train_tokenizer.log
+    export PYTHONPATH=. && python3 src/pretraining/train_tokenizer.py | tee train_tokenizer.log
 ```
 2. Evaluate tokenizer
 ```shell
-    export PYTHONPATH=. && python src/pretraining/evaluate_tokenizer.py | tee evaluate_tokenizer.log
+    export PYTHONPATH=. && python3 src/pretraining/evaluate_tokenizer.py | tee evaluate_tokenizer.log
 ```
 3. Mod Teacher Model
 ```shell
@@ -105,7 +105,7 @@ or
 ```
 6. Longformerize MLM
 ```shell
-    export PYTHONPATH=. && python src/modding/longformerize_model.py | tee longformerize_model.log
+    export PYTHONPATH=. && python3 src/modding/longformerize_model.py --roberta_model_path joelito/legal-xlm-roberta-base --longformer_model_path data/plms/legal-xlm-longformer-base | tee longformerize_model.log
 ```
 7. Train Longformer MLM (monolingual: 50K steps) (only GPUs!)
 ```shell

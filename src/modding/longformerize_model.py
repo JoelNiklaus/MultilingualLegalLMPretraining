@@ -12,7 +12,7 @@ def convert_roberta_to_htf():
     parser = argparse.ArgumentParser()
 
     # Required arguments
-    parser.add_argument('--roberta_model_path', default='lexlms/legal-xlm-roberta')
+    parser.add_argument('--roberta_model_path', default='joelito/legal-xlm-roberta-base')
     parser.add_argument('--longformer_model_path', default=os.path.join(DATA_DIR, 'plms', 'legal-xlm-longformer-base'))
     parser.add_argument('--max_length', default=4096, type=int)
     parser.add_argument('--window_size', default=128, type=int)
