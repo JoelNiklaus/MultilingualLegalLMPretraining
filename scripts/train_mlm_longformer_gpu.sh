@@ -1,17 +1,19 @@
-export WANDB_PROJECT="legal-xlm"
+export WANDB_PROJECT="multilinguallegalpretraining"
 export PYTHONPATH=.
 export CUDA_VISIBLE_DEVICES = 0,1,2,3,4,5,6,7
+
+# Just longformerize the xlm and swiss models
 
 MODEL_MAX_LENGTH=4096
 MODEL_PATH='plms/legal-xlm-longformer-base'
 BATCH_SIZE=4
-ACCUMULATION_STEPS=2
+ACCUMULATION_STEPS=16
 
 python3 src/pretraining/train_mlm.py \
     --model_name_or_path data/${MODEL_PATH} \
     --do_train \
     --do_eval \
-    --dataset_name joelito/MultiLegalPile_Chunks_500 \
+    --dataset_name joelito/MultiLegalPile_Chunks_4000 \
     --output_dir data/${MODEL_PATH}-mlm \
     --overwrite_output_dir \
     --logging_steps 1000 \
